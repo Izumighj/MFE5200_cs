@@ -1,161 +1,182 @@
-\section{Mean-variance and Optimization}
-\subsection{Portfolio Constraints}
+\section{Discretization Methods}
 
-\subsubsection*{Review: Markowitz Mean-Variance Problem}
-Recall the standard Markowitz Mean-Variance Problem:
+\subsection{Euler And Milstein Schemes}
 
-\centerline{$ \min_{w_0, w} \quad \frac{1}{2}w^{\top}Cw $}
+\subsubsection*{Euler scheme}
 
-\centerline{$\mathrm{s.t.}\quad w_{0}r_{f} + w^{\top}\mu = z $}
+For the SDE $dX(t)=a(X(t))\,dt+b(X(t))\,dW(t)$, with $X\in\mathbb{R}^d$ and $W\in\mathbb{R}^m$, the Euler approximation on $t_i=ih$ is
 
-\centerline{$
-w_{0} + w^{\top}\mathbf{1}_{n} = 1
-$}
+$\hat X(i+1)=\hat X(i)+a(\hat X(i))h+b(\hat X(i))\sqrt h\,Z_{i+1}$,
 
-where $w_0$ is the weight in the risk-free asset, $w$ is the vector of weights in risky assets, $C$ is the covariance matrix, and $\mu$ is the expected return vector.
+where $Z_i$ are independent $m$-dimensional standard normals. Euler freezes the drift and diffusion integrands on each interval. The drift is order $h$, while the diffusion increment is order $\sqrt h$, so a first refinement focuses on the diffusion term.
 
-\noindent \textbf{Equivalent formulation}:
+\subsubsection*{Scalar Milstein refinement}
 
-\centerline{$
-\min_{w} \quad \frac{1}{2}w^{\top}Cw
-$}
+In the scalar case, Ito's formula gives
 
-\centerline{$
-\mathrm{s.t.}\quad w^{\top}(\mu - r_{f}\mathbf{1}_{n}) = z - r_{f}
-$}
+$db(X(t))=\left[b'(X(t))a(X(t))+\frac12 b''(X(t))b^2(X(t))\right]dt
+\\+b'(X(t))b(X(t))\,dW(t)$.
 
-The above formulation does not take into accounts of constraints in real trading.
+Dropping the higher-order drift part,
 
-\subsubsection*{Basic Trading Constraints}
+$b(X(u))\approx b(X(t))+b'(X(t))b(X(t))[W(u)-W(t)]$.
 
-\noindent \textbf{No Short selling}: $w_{i} \ge 0$, for $i=1, \dots, n$. \\
-\noindent \textbf{No borrowing}: $w_{0} \ge 0$, which implies $\sum_{i=1}^{n}w_{i} \le 1$.
+With $\Delta W=W(t+h)-W(t)$,
 
+$\int_t^{t+h}b(X(u))\,dW(u)\approx b(X(t))\Delta W+
+\\b'(X(t))b(X(t))\int_t^{t+h}[W(u)-W(t)]\,dW(u)$.
 
-\subsubsection*{Margin Requirement for Short Sale}
+The remaining integral is
 
-Suppose that for stock $i$, the short sale of account of this stock should have $(1+m_{i})$ of the value of the short sale. Suppose the margin account earns a deterministic net return rate $r_{c}$. Denote by $v_{i}$ the amount of margin prepared for the short sale of stock $i$, and denote $v := (v_{1}, \dots, v_{n})$.
+$\int_t^{t+h}[W(u)-W(t)]\,dW(u)=\frac12(\Delta W)^2-\frac12h$.
 
-\noindent \textbf{Portfolio Net Return}:
+Thus the Milstein one-step approximation is
 
-\centerline{$
-R_{(w,v)} = w^{\top}R + v^{\top}r_{c}\mathbf{1}_{n} + (1 - w^{\top}\mathbf{1}_{n} - v^{\top}\mathbf{1}_{n})r_{f}
-$}
+$X(t+h)\approx X(t)+a(X(t))h+b(X(t))\Delta W+\frac12b'(X(t))b(X(t))\{(\Delta W)^2-h\}$.
 
-\centerline{$
-\Rightarrow R_{(w,v)} = r_{f} + w^{\top}(R - r_{f}\mathbf{1}_{n}) + v^{\top}(r_{c} - r_{f})\mathbf{1}_{n}
-$}
+Equivalently, with $\Delta W=\sqrt h\,Z_{i+1}$,
 
-\noindent \textbf{Moments}:
-Variance is given by $\text{Var}(R_{(w,v)}) = w^{\top}Cw$. Expectation is given by 
+$\hat X(i+1)=\hat X(i)+a(\hat X(i))h+b(\hat X(i))\sqrt h\,Z_{i+1}+\frac12 b'(\hat X(i))b(\hat X(i))h(Z_{i+1}^2-1)$.
 
-\centerline{$
-\mathbb{E}[R_{(w,v)}] = r_{f} + w^{\top}(\mu - r_{f}\mathbf{1}_{n}) + v^{\top}(r_{c} - r_{f})\mathbf{1}_{n}
-$}
+Conditional on $\hat X(i)$, the extra term has mean $0$ and is uncorrelated with the Euler diffusion term since $Z^2-1$ and $Z$ are uncorrelated.
 
-\noindent \textbf{Constraints}:
-Constraints to model margin requirements:
+\subsubsection*{GBM comparison}
 
-\centerline{$
-v_{i} \ge -(1+m_{i})w_{i}, \quad v_{i} \ge 0, \quad i=1, \dots, n.
-$}
+For $dX_t=rX_t\,dt+\sigma X_t\,dW_t$, Euler is
 
-\subsubsection*{Cardinality Constraints}
-Due to various forms of market friction, most investors can invest in only a limited number of assets, leading to cardinality constraints. Suppose one can invest in at most $s$ stocks. The cardinality constraint can be formulated as the following linear constraints:
+$\hat X_{t_{i+1}}=\hat X_{t_i}+r\hat X_{t_i}h+\sigma\hat X_{t_i}\sqrt h\,Z_{i+1}$.
 
-\centerline{$
--M\delta_{i} \le w_{i} \le M\delta_{i}, \quad \delta_{i} \in \{0,1\}, \quad i=1, \dots, n
-$}
+Milstein is
 
-\centerline{$
-\sum_{i=1}^{n}\delta_{i} \le s
-$}
+$\hat X_{t_{i+1}}=\hat X_{t_i}+r\hat X_{t_i}h+\sigma\hat X_{t_i}\sqrt h\,Z_{i+1}+\frac12\sigma^2\hat X_{t_i}h(Z_{i+1}^2-1)$.
 
-where $M$ is a given, sufficiently large number, and $\delta_{i}$ denotes whether one invests in stock $i$.
+The exact benchmark is
 
-\subsubsection*{Buy-In Threshold Constraints}
-Small positions have very limited impact on the total performance of the portfolio, but trigger non-negligible establishing and maintaining cost. To avoid small positions, one can impose a buy-in threshold constraint to prevent from holding an active position less than a prescribed proportion $w_{\min} > 0$ of the total capital.
-The buy-in threshold constraint can be modeled as the following linear constraints:
+$X_{t_{i+1}}=X_{t_i}\exp\{(r-\frac12\sigma^2)h+\sigma\sqrt h\,Z_{i+1}\}$.
 
-\centerline{$
-w_{i} \le M\delta_{i}, \quad w_{\min}\delta_{i} \le w_{i}, \quad \delta_{i} \in \{0,1\}, \quad i=1, \dots, n
-$}
+In the lecture's numerical comparison, Euler strong error is order $\sqrt h$, while Milstein error is order $h$.
 
-where $M$ is a given, sufficiently large number.
+\subsubsection*{Multidimensional difficulty}
 
-\subsubsection*{Diversification Constraints}
-Suppose that the $n$ stocks are divided into $K$ sectors, and $S_{k}$ is the collection of the identities of stocks in section $k$, $k=1, \dots, K$. Suppose that the investor wants to invest in at least $K_{\min}$ sectors, and for each sector she wants to invest, the minimum predefined level of investment is $s_{\min}$.
-The above diversification constraint can be modeled as the following linear constraints:
-\centerline{$
-\sum_{k=1}^{K}\zeta_{k} \ge K_{\min}
-$}
-\centerline{$
-s_{\min}\zeta_{k} \le \sum_{i \in S_{k}}w_{i} \le M\zeta_{k}, \quad k=1, \dots, K
-$}
+For components $X_i$, $W_j$, $a_i$, and $b_{ij}$,
 
-where $M$ is a given, sufficiently large number.
+$X_i(t+h)=X_i(t)+\int_t^{t+h}a_i(X(u))\,du+\sum_{j=1}^m\int_t^{t+h}b_{ij}(X(u))\,dW_j(u)$.
 
-\subsubsection*{Proportional Transaction Costs and Bid-Ask Spread}
-Suppose that there is a proportional transaction cost that amounts to $c_{v,b}$ dollars for each dollar invested in a stock, and a similar cost $c_{v,s}$ when selling the stock at the end of the period. For simplicity, suppose short sales are not allowed.
-Let $w_{i}$ represent the proportion of the initial capital, pre-transaction cost, invested in stock $i$.
-Proportional transaction costs can be taken into account by modifying the net return rate of a stock $R_{i}$, which is computed from the stock price directly, as follows:
+The diffusion refinement contains
 
-\centerline{$
-R_{i}^{\prime} := \frac{1-c_{v,s}}{1+c_{v,b}}(1+R_{i}) - 1
-$}
+$\int_t^{t+h} b_{ij}(X(u))\,dW_j(u)\approx b_{ij}(X(t))\Delta W_j
+\\+\sum_{\ell=1}^d\sum_{k=1}^m\frac{\partial b_{ij}}{\partial x_\ell}(X(t))b_{\ell k}(X(t))I_{kj}$,
 
-To take into account the bid-ask spread, one only needs to use the ask price at the beginning of the period and the bid price at the end of the period to compute the net return rate $R_{i}$.
+where
 
-\subsection{Relative Entropy Model}
-Suppose that the agent is uncertain about the model, which is represented by the probability density function of the excess return of the risky assets. The agent has a reference model $f_{0}$ but considers alternative models $f$.
-Consider the log likelihood ratio of an alternative model $f$ and the reference model $f_{0}$ based on observed asset returns $X_{t}$:
+$I_{kj}=\int_t^{t+h}[W_k(u)-W_k(t)]\,dW_j(u)$.
 
-\centerline{$
-R(X_{1}, \dots, X_{T}) = \sum_{t=1}^{T} \log(f(X_{t})/f_{0}(X_{t}))
-$}
+For $k=j$, $I_{jj}=\frac12(\Delta W_j)^2-\frac12h$. For $k\ne j$, the mixed integrals have no comparable simple formula; their differences are Levy area terms, and sampling them is difficult.
 
-By the law of large numbers, under the model $f$:
+\subsection{Lamperti Transform}
 
-$\lim_{T \to \infty} \frac{1}{T}R(X_{1}, \dots, X_{T}) = \mathbb{E}^{f}[\log(f(X_{t})/f_{0}(X_{t}))]$
+\subsubsection*{Definition}
 
-$= \mathbb{E}^{f_{0}}[f(X_{t})/f_{0}(X_{t})\log(f(X_{t})/f_{0}(X_{t}))]$
+For $dX_t=b(X_t)\,dt+\sigma(X_t)\,dW_t$ with $\sigma(x)>0$, define
 
-The term $\mathbb{E}^{f_{0}}[f(X_{t})/f_{0}(X_{t})\log(f(X_{t})/f_{0}(X_{t}))]$ is called the relative entropy of the model $f$ with respect to the reference model $f_{0}$.
+$Y_t=F(X_t),\qquad F(x)=\int\frac{1}{\sigma(x)}\,dx$.
 
-The agent faces the following problem:
+Then $F$ is increasing and $X_t=F^{-1}(Y_t)$. Since
 
-\centerline{$ 
-\min_{f \in \mathcal{P}} \max_{w} \left[ \lambda w^{\top}\mathbb{E}^{f}[X] - \frac{1}{2}w^{\top}\text{Var}^{f}(X)w \right]
-$}
+$F'(x)=1/\sigma(x),\qquad F''(x)=-\sigma'(x)/\sigma^2(x)$,
 
-where $X$ stands for the excess return vector of the risky assets and $\text{Var}^{f}$ stands for the variance under $f$, and
+Ito's formula gives
 
-\centerline{$ \displaystyle \mathcal{P} := \{f \mid \mathbb{E}^{f_{0}}[f(X_{t})/f_{0}(X_{t})\log(f(X_{t})/f_{0}(X_{t}))] \le \eta\}$}
+$dY_t=\left[\frac{b(X_t)}{\sigma(X_t)}-\frac12\sigma'(X_t)\right]dt+dW_t$.
 
-for some positive parameter $\eta$.
+Writing $X_t=F^{-1}(Y_t)$,
 
-Assume that the excess return vector follows joint normal distribution. Assume that the covariance matrix $C$ is known, and alternative model $f$ differs from the reference model $f_{0}$ in the mean. Denote the mean under $f$ and $f_{0}$ as $\mu$ and $\mu_{0}$, respectively. Then, the relative entropy of $f$ is:
+$dY_t=a(Y_t)\,dt+dW_t,\qquad a(y)=\frac{b(F^{-1}(y))}{\sigma(F^{-1}(y))}-\frac12\sigma'(F^{-1}(y))$.
 
-\centerline{$ \displaystyle \mathbb{E}^{f_{0}}[f(X_{t})/f_{0}(X_{t})\log(f(X_{t})/f_{0}(X_{t}))] = \frac{1}{2}(\mu - \mu_{0})^{\top}C^{-1}(\mu - \mu_{0})$}
+Thus Lamperti converts state-dependent volatility into constant volatility one. Euler through Lamperti uses
 
-The agent's problem becomes:
+$\hat Y_{t_{i+1}}=\hat Y_{t_i}+a(\hat Y_{t_i})\Delta t_{i+1}+\sqrt{\Delta t_{i+1}}Z_{i+1},\qquad \hat X_{t_{i+1}}=F^{-1}(\hat Y_{t_{i+1}})$.
 
-\centerline{$ \min_{(\mu - \mu_{0})^{\top}C^{-1}(\mu - \mu_{0}) \le 2\eta} \max_{w} \left[ \lambda w^{\top}\mu - \frac{1}{2}w^{\top}Cw \right]$}
+\subsubsection*{GBM transform}
 
-\noindent \textbf{Optimal solution}:
+For $dX_t=rX_t\,dt+\sigma X_t\,dW_t$,
 
-If $\mu_{0}^{\top}C^{-1}\mu_{0} \le 2\eta$, then $w^{*} = 0$.
+$F(x)=\frac{1}{\sigma}\log x,\qquad Y_t=\frac{1}{\sigma}\log X_t,\qquad X_t=e^{\sigma Y_t}$.
 
-If $\mu_{0}^{\top}C^{-1}\mu_{0} > 2\eta$, then
-$w^{*} = \lambda \left( 1 - \sqrt{\frac{2\eta}{\mu_{0}^{\top}C^{-1}\mu_{0}}} \right) C^{-1}\mu_{0}$
+Ito's formula gives
 
-\subsection{A Smooth-Ambiguity Model}
-The worst-case mean-variance portfolio selection is usually too conservative. We consider the smooth-ambiguity model, in which the investor has a belief of the model/parameters for the stock distributions, considers the average model/parameter setup instead of the worst-case scenario, and is averse to ambiguity about the model/parameters.
+$dY_t=\left(\frac{r}{\sigma}-\frac{\sigma}{2}\right)dt+dW_t$.
 
-Formally, denote by $P=(\mu, C)$ a model specification. The investor has a belief of $P$, represented by distribution $\pi$. Let $\overline{P} = (\overline{\mu}, \overline{C}) = \mathbb{E}_{\pi}[P]$ be the average model specification.
-The portfolio selection can be formulated as:
+Euler on $Y$ is exact, so transforming back gives a scheme for $X$ without discretization error.
 
-\centerline{$ \displaystyle \max_{w} \mathbb{E}_{\overline{P}}[R_{w}] - \frac{\lambda}{2}\text{Var}_{\overline{P}}(R_{w}) - \frac{\theta}{2}\text{Var}_{\pi}(\mathbb{E}_{P}[R_{w}])$}
+\subsection{Numerical Examples}
 
-where $\lambda > 0$ is the risk aversion parameter and $\theta > 0$ is the ambiguity aversion parameter.
+\subsubsection*{Exact grid for deterministic volatility}
 
+For a discretely monitored floating-strike lookback call with payoff $S_T-\min_{i=1,\ldots,m}S_{t_i}$ and
+
+$dS_t=rS_t\,dt+\theta(t)S_t\,dW_t$,
+
+set $Y_t=\log S_t$. Then
+
+$dY_t=(r-\frac12\theta^2(t))dt+\theta(t)dW_t$.
+
+Let $\sigma_i^2=\int_{t_i}^{t_{i+1}}\theta^2(t)\,dt$. The exact grid recursion is
+
+$Y_{i+1}=Y_i+r\Delta t_i-\frac12\sigma_i^2+\sigma_iZ_{i+1},\qquad S_{i+1}=e^{Y_{i+1}}$.
+
+The discounted output is $H=e^{-rT}(S_m-\min(S_1,\ldots,S_m))$. For $\theta(t)=\sqrt{a^2+b^2\sin(2\pi t/T)}$,
+
+$\sigma_i^2=a^2\Delta t_i+\frac{b^2T}{2\pi}\{\cos(2\pi t_i/T)-\cos(2\pi t_{i+1}/T)\}$.
+
+Exact grid simulation removes process discretization error, but a continuously monitored payoff can still be biased because the between-grid minimum is approximated.
+
+\subsubsection*{Artificial-dynamics control}
+
+For $dS_t=rS_tdt+\theta_tS_tdW_t$ and $d\theta_t=a(\Theta-\theta_t)dt+\beta dB_t$, with $\operatorname{corr}(dW,dB)=\rho$, set $Y_t=\log S_t$. Euler gives
+
+$\hat Y_{i+1}=\hat Y_i+(r-\frac12\hat\theta_i^2)\Delta t_i+\hat\theta_i\sqrt{\Delta t_i}Z_{i+1}$,
+
+$\hat\theta_{i+1}=\hat\theta_i+a(\Theta-\hat\theta_i)\Delta t_i+\beta\sqrt{\Delta t_i}R_{i+1}$.
+
+The call output is $X=e^{-rT}(e^{\hat Y_T}-K)^+$. Use the same $Z_i$ to define an artificial GBM log process
+
+$\bar Y_{i+1}=\bar Y_i+(r-\frac12\sigma^2)\Delta t_i+\sigma\sqrt{\Delta t_i}Z_{i+1}$.
+
+Then $V=e^{-rT}(e^{\bar Y_T}-K)^+$ has expectation $\operatorname{BSCall}(S_0,K,T,r,\sigma)$, giving the control output
+
+$X-b\{V-\operatorname{BSCall}(S_0,K,T,r,\sigma)\}$.
+
+Choosing $\sigma$ near the long-run mean $\Theta$ gives strong variance reduction in the lecture example.
+
+\subsubsection*{Heston with cross-entropy IS}
+
+For the Heston model
+
+$dS_t=rS_tdt+\sqrt{\theta_t}S_tdW_t,\qquad d\theta_t=a(b-\theta_t)dt+\sigma\sqrt{\theta_t}dB_t$,
+
+use the nonnegative Euler scheme
+
+$\hat S_{i+1}=\hat S_i+r\hat S_i\Delta t_i+\hat S_i\sqrt{\hat\theta_i\Delta t_i}\,Z_{i+1}$,
+
+$\hat\theta_{i+1}=\max\{0,\hat\theta_i+a(b-\hat\theta_i)\Delta t_i+\sigma\sqrt{\hat\theta_i\Delta t_i}\,R_{i+1}\}$,
+
+where $R_{i+1}=\rho Z_{i+1}+\sqrt{1-\rho^2}Y_{i+1}$. The payoff is $h(X)=e^{-rT}(\hat S_T-K)^+$ for $X=(Z_1,\ldots,Z_m,Y_1,\ldots,Y_m)$.
+
+For IS use $N(\mu,I_{2m})$, $\mu=(\nu,v)$. An initial tilt is
+
+$\nu^0=x(\sqrt{\Delta t_1},\ldots,\sqrt{\Delta t_m}),\qquad v^0=-\frac{\rho}{\sqrt{1-\rho^2}}\nu^0$,
+
+where matching $E[S_T]\approx K$ after replacing $\theta_t$ by $b$ gives
+
+$x=\frac{1}{\sqrt{bT}}\log\left(\frac{K}{S_0}\right)-\frac{r}{\sqrt b}$.
+
+The cross-entropy update is
+
+$\hat\mu^{j+1}=\frac{\sum_{k=1}^Nh(\bar X_k)e^{-\langle\mu^j,\bar X_k\rangle}\bar X_k}{\sum_{k=1}^Nh(\bar X_k)e^{-\langle\mu^j,\bar X_k\rangle}},\qquad \bar X_k\sim N(\mu^j,I_{2m})$.
+
+After $\hat\mu=(\hat\nu,\hat v)$ is chosen, simulate $Z_i\sim N(\hat\nu_i,1)$ and $Y_i\sim N(\hat v_i,1)$ and multiply the payoff by
+
+$\exp\left\{-\sum_{i=1}^m(\hat\nu_iZ_i+\hat v_iY_i)+\frac12\sum_{i=1}^m(\hat\nu_i^2+\hat v_i^2)\right\}$.
+
+The variance reduction is strongest for high strikes.
