@@ -1,0 +1,281 @@
+\section{Generating Sample Paths}
+
+\subsection{Brownian Motion}
+
+\subsubsection*{One-dimensional BM}
+
+A standard Brownian motion $W(t)$ on $[0,T]$ satisfies $W(0)=0$, continuous sample paths, independent increments, and
+
+$W(t)-W(s)\sim N(0,t-s),\qquad 0\le s<t\le T$.
+
+Hence $W(t)\sim N(0,t)$. A Brownian motion with drift $\mu$ and diffusion coefficient $\sigma^2$, written $X\sim\operatorname{BM}(\mu,\sigma^2)$, can be represented by
+
+$X(t)=X(0)+\mu t+\sigma W(t)$,
+
+so $X(t)\sim N(X(0)+\mu t,\sigma^2t)$ and
+
+$dX(t)=\mu\,dt+\sigma\,dW(t)$.
+
+With deterministic time-varying coefficients,
+
+$dX(t)=\mu(t)\,dt+\sigma(t)\,dW(t)$,
+
+$X(t)=X(0)+\int_0^t\mu(s)\,ds+\int_0^t\sigma(s)\,dW(s)$.
+
+For $0\le s<t$,
+
+$\mathbb{E}[X(t)-X(s)]=\int_s^t\mu(u)\,du$,
+
+$\operatorname{var}[X(t)-X(s)]=\int_s^t\sigma^2(u)\,du$.
+
+\subsubsection*{Random-walk construction}
+
+For dates $0=t_0<t_1<\cdots<t_n$, let $Z_1,\ldots,Z_n$ be independent $N(0,1)$. For standard BM,
+
+$W(t_{i+1})=W(t_i)+\sqrt{t_{i+1}-t_i}\,Z_{i+1},\qquad i=0,\ldots,n-1$.
+
+For $X\sim\operatorname{BM}(\mu,\sigma^2)$ with constant coefficients,
+
+$X(t_{i+1})=X(t_i)+\mu(t_{i+1}-t_i)+\sigma\sqrt{t_{i+1}-t_i}\,Z_{i+1}$.
+
+For time-dependent coefficients, the exact grid recursion is
+
+$X(t_{i+1})=X(t_i)+\int_{t_i}^{t_{i+1}}\mu(s)\,ds+\sqrt{\int_{t_i}^{t_{i+1}}\sigma^2(u)\,du}\,Z_{i+1}$.
+
+These recursions are exact at the grid points. Discretization error appears if the path is deterministically interpolated between grid points. The Euler approximation
+
+$X(t_{i+1})=X(t_i)+\mu(t_i)(t_{i+1}-t_i)+\sigma(t_i)\sqrt{t_{i+1}-t_i}\,Z_{i+1}$
+
+is generally biased even at the grid dates when $\mu,\sigma$ vary in time, since it uses approximate increment mean and variance.
+
+\subsubsection*{Multivariate normal view}
+
+The vector $(W(t_1),\ldots,W(t_n))$ is multivariate normal with mean $0$ and covariance matrix $C$ satisfying
+
+$C_{ij}=\operatorname{Cov}(W(t_i),W(t_j))=\min(t_i,t_j)$.
+
+Thus one may simulate it as $AZ$, where $Z\sim N(0,I_n)$ and $AA^\top=C$. For the Brownian covariance matrix, a lower triangular factor is compactly
+
+$A_{ij}=\sqrt{t_j-t_{j-1}}\,\mathbf{1}_{\{i\ge j\}},\qquad t_0=0$.
+
+This Cholesky method is the matrix form of the random-walk construction. Direct multiplication is $O(n^2)$, while the recursive construction is $O(n)$.
+
+For $X\sim\operatorname{BM}(\mu,\sigma^2)$, the mean vector has entries $\mu t_i$, the covariance matrix is $\sigma^2C$, and the factor is $\sigma A$.
+
+\subsection{Multidimensional Brownian Motion}
+
+\subsubsection*{Definition and representation}
+
+A standard $d$-dimensional Brownian motion $W(t)=(W_1(t),\ldots,W_d(t))^\top$ has
+
+$W(t)-W(s)\sim N(0,(t-s)I)$.
+
+Thus each coordinate is standard BM and different coordinates are independent. For $\mu\in\mathbb{R}^d$ and positive semidefinite $\Sigma$, $X\sim\operatorname{BM}(\mu,\Sigma)$ means
+
+$X(t)-X(s)\sim N((t-s)\mu,(t-s)\Sigma)$.
+
+If $BB^\top=\Sigma$ and $W$ is standard BM, then
+
+$X(t)=X(0)+\mu t+BW(t)$,
+
+and $dX(t)=\mu\,dt+B\,dW(t)$. The law depends on $B$ only through $BB^\top$.
+
+\subsubsection*{Time-varying coefficients}
+
+For
+
+$dX(t)=\mu(t)\,dt+B(t)\,dW(t),\qquad B(t)B(t)^\top=\Sigma(t)$,
+
+the increment distribution is
+
+$X(t)-X(s)\sim N\left(\int_s^t\mu(u)\,du,\int_s^t\Sigma(u)\,du\right)$.
+
+For $X\sim\operatorname{BM}(\mu,\Sigma)$,
+
+$\operatorname{Cov}[X_i(s),X_j(t)]=\min(s,t)\Sigma_{ij}$.
+
+\subsubsection*{Simulation}
+
+Let $Z_1,Z_2,\ldots$ be independent $N(0,I)$ vectors. Standard $d$-dimensional BM is simulated by
+
+$W(t_{i+1})=W(t_i)+\sqrt{t_{i+1}-t_i}\,Z_{i+1}$.
+
+For $X\sim\operatorname{BM}(\mu,\Sigma)$, factor $\Sigma=BB^\top$ and use
+
+$X(t_{i+1})=X(t_i)+\mu(t_{i+1}-t_i)+\sqrt{t_{i+1}-t_i}\,BZ_{i+1}$.
+
+For time-dependent covariance, use
+
+$X(t_{i+1})=X(t_i)+\int_{t_i}^{t_{i+1}}\mu(s)\,ds+B_iZ_{i+1}$,
+
+where
+
+$B_iB_i^\top=\int_{t_i}^{t_{i+1}}\Sigma(u)\,du$.
+
+This may require a separate factorization for each time step.
+
+\subsection{Geometric Brownian Motion}
+
+\subsubsection*{Exact solution and recursion}
+
+A geometric Brownian motion is exponential Brownian motion:
+
+$\frac{dS(t)}{S(t)}=\mu\,dt+\sigma\,dW(t),\qquad S\sim\operatorname{GBM}(\mu,\sigma^2)$.
+
+The exact solution is
+
+$S(t)=S(0)\exp\left(\left[\mu-\frac12\sigma^2\right]t+\sigma W(t)\right)$.
+
+For $u<t$,
+
+$S(t)=S(u)\exp\left(\left[\mu-\frac12\sigma^2\right](t-u)+\sigma(W(t)-W(u))\right)$.
+
+Hence for $0=t_0<t_1<\cdots<t_n$,
+
+$S(t_{i+1})=S(t_i)\exp\left(\left[\mu-\frac12\sigma^2\right]\Delta t_i+\sigma\sqrt{\Delta t_i}\,Z_{i+1}\right)$,
+
+where $\Delta t_i=t_{i+1}-t_i$. This is exact at the simulated dates and has no model discretization error.
+
+\subsubsection*{Lognormal distribution}
+
+Write $Y\sim LN(\mu,\sigma^2)$ if $Y=\exp(\mu+\sigma Z)$ with $Z\sim N(0,1)$. Then
+
+$P(Y\le y)=\Phi\left(\frac{\log y-\mu}{\sigma}\right)$,
+
+$f(y)=\frac{1}{y\sigma\sqrt{2\pi}}\exp\left(-\frac{(\log y-\mu)^2}{2\sigma^2}\right)$.
+
+Using $\mathbb{E}[e^{aZ}]=e^{a^2/2}$,
+
+$\mathbb{E}[Y]=e^{\mu+\sigma^2/2},\qquad \operatorname{var}(Y)=e^{2\mu+\sigma^2}(e^{\sigma^2}-1)$.
+
+Also $P(Y\le e^\mu)=1/2$, so $e^\mu$ is the median. For $S\sim\operatorname{GBM}(\mu,\sigma^2)$,
+
+$\frac{S(t)}{S(0)}\sim LN\left(\left[\mu-\frac12\sigma^2\right]t,\sigma^2t\right)$,
+
+$\mathbb{E}[S(t)]=e^{\mu t}S(0),\qquad \operatorname{var}[S(t)]=e^{2\mu t}S^2(0)(e^{\sigma^2t}-1)$.
+
+The Markov conditional mean is
+
+$\mathbb{E}[S(t)\mid S(\tau),0\le\tau\le u]=\mathbb{E}[S(t)\mid S(u)]=e^{\mu(t-u)}S(u)$.
+
+\subsection{Risk-Neutral Dynamics}
+
+\subsubsection*{Assets and futures}
+
+With constant continuously compounded rate $r$, $\beta(t)=e^{rt}$. Under the risk-neutral measure, for a non-dividend-paying asset,
+
+$\frac{S(u)}{\beta(u)}=\mathbb{E}\left[\frac{S(t)}{\beta(t)}\mid \{S(\tau),0\le\tau\le u\}\right]$.
+
+Thus the risk-neutral GBM dynamics are
+
+$\frac{dS(t)}{S(t)}=r\,dt+\sigma\,dW(t)$.
+
+With continuous dividend yield $\delta$,
+
+$\frac{dS(t)}{S(t)}=(r-\delta)\,dt+\sigma\,dW(t)$.
+
+For a futures price $F(t,T)$ with fixed maturity $T$, the risk-neutral futures price is a martingale. If modeled by GBM,
+
+$\frac{dF(t,T)}{F(t,T)}=\sigma\,dW(t)$.
+
+\subsection{Path-Dependent Payoffs}
+
+\subsubsection*{Asian options}
+
+For monitoring dates $t_1,\ldots,t_n$, the arithmetic average is
+
+$\bar{S}=\frac{1}{n}\sum_{i=1}^n S(t_i)$.
+
+Asian call and put payoffs are $(\bar{S}-K)^+$ and $(K-\bar{S})^+$. Floating-strike variants include $(S(T)-\bar{S})^+$ and $(\bar{S}-S(T))^+$. The arithmetic average distribution is generally intractable, so simulation is natural.
+
+For continuous monitoring over $[u,t]$,
+
+$\bar{S}=\frac{1}{t-u}\int_u^tS(\tau)\,d\tau$.
+
+\subsubsection*{Geometric average options}
+
+The discrete geometric average is
+
+$G=\left(\prod_{i=1}^nS(t_i)\right)^{1/n}$.
+
+Because lognormal variables remain lognormal under geometric averaging, these options are analytically convenient. Under risk-neutral GBM with dividend yield $\delta$,
+
+$G=S(0)\exp\left(\left[r-\delta-\frac12\sigma^2\right]\frac{1}{n}\sum_{i=1}^nt_i+\frac{\sigma}{n}\sum_{i=1}^nW(t_i)\right)$.
+
+Since $\operatorname{Cov}(W(s),W(t))=\min(s,t)$,
+
+$\sum_{i=1}^nW(t_i)\sim N\left(0,\sum_{i=1}^n(2i-1)t_{n+1-i}\right)$.
+
+The geometric average has the same distribution as a GBM value at
+
+$T_G=\frac{1}{n}\sum_{i=1}^nt_i$,
+
+with adjusted volatility and dividend yield
+
+$\bar{\sigma}^2=\frac{\sigma^2}{n^2T_G}\sum_{i=1}^n(2i-1)t_{n+1-i}$,
+
+$\bar{\delta}=\delta+\frac12\sigma^2-\frac12\bar{\sigma}^2$.
+
+Thus a geometric-average option can be priced using Black-Scholes with adjusted parameters. The continuous geometric average
+
+$\exp\left(\frac{1}{t-u}\int_u^t\log S(\tau)\,d\tau\right)$
+
+is also lognormally distributed.
+
+\subsubsection*{Barrier and lookback options}
+
+A discretely monitored down-and-out call with barrier $b$ has payoff
+
+$\mathbf{1}_{\{\tau(b)>T\}}(S(T)-K)^+,\qquad \tau(b)=\inf\{t_i:S(t_i)<b\}$.
+
+If no grid value crosses below $b$, set $\tau(b)=\infty$. A down-and-in call has payoff
+
+$\mathbf{1}_{\{\tau(b)\le T\}}(S(T)-K)^+$.
+
+For continuous monitoring, use $\tilde{\tau}(b)=\inf\{t\ge0:S(t)\le b\}$. Discretely monitored barrier options are priced by simulating $S(t_1),\ldots,S(t_n),S(T)$.
+
+Lookback options depend on path extrema. Discrete lookback put and call payoffs at $t_n$ are
+
+$\max_{i=1,\ldots,n}S(t_i)-S(t_n),\qquad S(t_n)-\min_{i=1,\ldots,n}S(t_i)$.
+
+\subsection{Multi-Asset GBM}
+
+\subsubsection*{Correlated assets}
+
+Let $X_i$ be standard Brownian motions with correlations $\rho_{ij}$. A multidimensional GBM is
+
+$\frac{dS_i(t)}{S_i(t)}=\mu_i\,dt+\sigma_i\,dX_i(t),\qquad i=1,\ldots,d$.
+
+Define $\Sigma_{ij}=\sigma_i\sigma_j\rho_{ij}$. Then $(\sigma_1X_1,\ldots,\sigma_dX_d)\sim\operatorname{BM}(0,\Sigma)$ and $S=(S_1,\ldots,S_d)\sim\operatorname{GBM}(\mu,\Sigma)$.
+
+The price covariance is
+
+$\operatorname{Cov}[S_i(t),S_j(t)]=S_i(0)S_j(0)e^{(\mu_i+\mu_j)t}\left(e^{\rho_{ij}\sigma_i\sigma_jt}-1\right)$.
+
+If $AA^\top=\Sigma$ and $a_i$ is the $i$th row of $A$,
+
+$\frac{dS_i(t)}{S_i(t)}=\mu_i\,dt+a_i\,dW(t)=\mu_i\,dt+\sum_{j=1}^dA_{ij}\,dW_j(t)$.
+
+\subsubsection*{Simulation and payoffs}
+
+With independent $Z_k=(Z_{k1},\ldots,Z_{kd})\sim N(0,I)$,
+
+$S_i(t_{k+1})=S_i(t_k)\exp\left(\left[\mu_i-\frac12\sigma_i^2\right]\Delta t_k+\sqrt{\Delta t_k}\sum_{j=1}^dA_{ij}Z_{k+1,j}\right)$.
+
+Under the risk-neutral measure, $\mu_i=r-\delta_i$. Typical multi-asset payoffs:
+
+Spread option:
+
+$([S_1(T)-S_2(T)]-K)^+$.
+
+Basket option:
+
+$([c_1S_1(T)+c_2S_2(T)+\cdots+c_dS_d(T)]-K)^+$.
+
+Outperformance option:
+
+$(\max\{c_1S_1(T),c_2S_2(T),\ldots,c_dS_d(T)\}-K)^+$.
+
+Two-asset barrier example:
+
+$\mathbf{1}_{\{\min_{i=1,\ldots,n}S_2(t_i)<b\}}(K-S_1(T))^+$.
