@@ -1,240 +1,207 @@
-\section{Mean-Risk Opt and EU Max}
+\section{Estimating Sensitivities}
 
-Denote by $R=(R_{1},...,R_{n})^{\top}$ the net return vector of the stocks and $r_{f}$ the risk-free net return rate. Given portfolio $w=(w_{1},...,w_{n})^{\top}$, where $w_{i}$ represents the percentage of initial wealth invested in stock $i$, the net return rate of the portfolio is:
+\subsection{Finite Differences}
 
-\centerline{$R_{w}=r_{f}+w^{\top}(R-r_{f}1_{n})$}
+\subsubsection*{Bias}
 
-\subsection{Mean-Semi-variance Model}
+Let $\alpha(\theta)=\mathbb{E}[Y(\theta)]$. The forward-difference estimator is
 
-One alternative to variance is semi-variance:
+$\hat\Delta_F(n,h)=\frac{\bar Y_n(\theta+h)-\bar Y_n(\theta)}{h}$.
 
-\centerline{$\mathbb{E}[(\min(R_{w}-\mathbb{E}[R_{w}],0)^{2})]$}
+Since $\mathbb{E}[\hat\Delta_F]=h^{-1}\{\alpha(\theta+h)-\alpha(\theta)\}$, if $\alpha$ is twice differentiable,
 
-This measures the downside risk of the portfolio. If the distribution is symmetrical, semi-variance is proportional to variance; in general, it is not the case. The Mean-semi-variance portfolio selection problem is formulated as:
+$\operatorname{Bias}(\hat\Delta_F)=\mathbb{E}[\hat\Delta_F-\alpha'(\theta)]=\frac12\alpha''(\theta)h+o(h)$.
 
-\centerline{$\min_{w} \mathbb{E}[(\min(R_{w}-\mathbb{E}[R_{w}],0)^{2})]$}
+The central-difference estimator is
 
-\centerline{$\mathrm{s.t.}\quad \mathbb{E}[R_{w}]\ge z$}
+$\hat\Delta_C(n,h)=\frac{\bar Y_n(\theta+h)-\bar Y_n(\theta-h)}{2h}$.
 
-\subsection{Mean-Absolute Deviation Model}
+Taylor expansion gives $\operatorname{Bias}(\hat\Delta_C)=o(h)$; if $\alpha'''(\theta)$ exists,
 
-Another alternative to variance is absolute deviation:
+$\operatorname{Bias}(\hat\Delta_C)=\frac16\alpha'''(\theta)h^2+o(h^2)$.
 
-\centerline{$\mathbb{E}[|R_{w}-\mathbb{E}[R_{w}]|]$}
+Central difference costs more if $\alpha(\theta)$ is also needed, but has smaller bias order.
 
-Mean-absolute deviation portfolio selection is formulated as:
+\subsubsection*{Variance and common random numbers}
 
-\centerline{$\min_{w} \mathbb{E}[|R_{w}-\mathbb{E}[R_{w}]|]$}
+$\operatorname{var}[\hat\Delta_F]=h^{-2}\operatorname{var}[\bar Y_n(\theta+h)-\bar Y_n(\theta)]$,
 
-\centerline{$\mathrm{s.t.}\quad \mathbb{E}[R_{w}]\ge z$}
+$\operatorname{var}[\hat\Delta_C]=(2h)^{-2}\operatorname{var}[\bar Y_n(\theta+h)-\bar Y_n(\theta-h)]$.
 
-\subsection{Safety-First Model}
+The factor $h^{-2}$ makes very small $h$ dangerous unless $n$ is increased or the two simulations are strongly coupled. For a GBM call delta, use the same $Z_i$ for $S_0+h$ and $S_0-h$:
 
-Safety-first portfolio selection is formulated as:
+$X_i=(S_0+h)e^{(r-\sigma^2/2)T+\sigma\sqrt T Z_i},\qquad Y_i=(S_0-h)e^{(r-\sigma^2/2)T+\sigma\sqrt T Z_i}$,
 
-\centerline{$\min_{w} \mathbb{P}(R_{w}\le D)$}
+$H_i=\frac{e^{-rT}(X_i-K)^+-e^{-rT}(Y_i-K)^+}{2h},\qquad \hat v=\frac1n\sum_{i=1}^nH_i$.
 
-\centerline{$\mathrm{s.t.}\quad \mathbb{E}[R_{w}]\ge z$}
+$\mathrm{SE}=\left[\frac{1}{n(n-1)}\left(\sum_{i=1}^nH_i^2-n\hat v^2\right)\right]^{1/2}$.
 
-Here, $D$ is a given threshold below which the portfolio return is considered to be a disaster. Both the mean-semi-variance and the mean-absolute deviation portfolio selection problems are convex programs, but the safety-first portfolio selection problem is not.
+\subsection{Pathwise Derivatives}
 
-\subsection{Tail Risk Measures}
+\subsubsection*{Method}
 
-In the safety-first criterion, investors are concerned about the left tail of the return distribution. 
+Differentiate the random output:
 
-Given initial wealth $x_{0}$ and a portfolio $w$, the wealth at the end of the period is $X_{T}=x_{0}(1+R_{w})$, and thus the P\&L of the portfolio is:
+$Y'(\theta)=\lim_{h\to0}\frac{Y(\theta+h)-Y(\theta)}{h}$.
 
-\centerline{$Z:=X_{T}-x_{0}=x_{0}R_{w}$}
+It is unbiased for $\alpha'(\theta)$ if
 
-\subsubsection*{Definition of VaR}
+$\mathbb{E}\left[\frac{d}{d\theta}Y(\theta)\right]=\frac{d}{d\theta}\mathbb{E}[Y(\theta)]$.
 
-Let $Z$ be a random P\&L, with negative values referring to losses and positive values to gains. Given a level $\alpha\in(0,1)$, informally the $\alpha$-VaR, denoted as $VaR_{\alpha}(Z)$, is defined by:
+Then estimate $\alpha'(\theta)$ by the sample average of copies of $Y'(\theta)$.
 
-\centerline{$\mathbb{P}(-Z\le VaR_{\alpha}(Z))=\alpha$}
+\subsubsection*{Black-Scholes delta}
 
-Formally, $VaR_{\alpha}(Z)$ is defined as follows:
+For $Y=e^{-rT}[S(T)-K]^+$ and $S(T)=S(0)e^{(r-\sigma^2/2)T+\sigma\sqrt TZ}$,
 
-\centerline{$VaR_{\alpha}(Z)=\inf\{x\in\mathbb{R}:\mathbb{P}(-Z\le x)\ge\alpha\}$}
+$\frac{dY}{dS(0)}=\frac{dY}{dS(T)}\frac{dS(T)}{dS(0)}$.
 
-\centerline{$=-\sup\{y\in\mathbb{R}:\mathbb{P}(Z<y)\le1-\alpha\}$}
+Since $d(x-K)^+/dx=\mathbf{1}_{\{x>K\}}$ except at $K$ and $\mathbb{P}(S(T)=K)=0$,
 
-\subsubsection*{Definition of CVaR}
+$\frac{dY}{dS(0)}=e^{-rT}\frac{S(T)}{S(0)}\mathbf{1}_{\{S(T)>K\}}$.
 
-Given a level $\alpha\in(0,1)$, informally the $\alpha$-CVaR, denoted as $CVaR_{\alpha}(Z)$, is defined by:
+\subsubsection*{Asian delta and vega}
 
-\centerline{$CVaR_{\alpha}(Z)=\mathbb{E}[-Z|-Z\ge VaR_{\alpha}(Z)]$}
+For $Y=e^{-rT}[\bar S-K]^+$ and $\bar S=m^{-1}\sum_{i=1}^mS(t_i)$,
 
-Formally, $CVaR_{\alpha}(Z)$ is defined by:
+$\frac{dY}{dS(0)}=e^{-rT}\mathbf{1}_{\{\bar S>K\}}\frac{\bar S}{S(0)}$.
 
-\centerline{$CVaR_{\alpha}(Z)=\frac{1}{1-\alpha}\int_{\alpha}^{1}VaR_{\beta}(Z)d\beta$}
+For vega, with
 
-CVaR can be derived by solving an optimization problem:
+$S(t_i)=S(t_{i-1})e^{(r-\sigma^2/2)(t_i-t_{i-1})+\sigma\sqrt{t_i-t_{i-1}}Z_i}$,
 
-\centerline{$CVaR_{\alpha}(Z)=\min_{b}\{b+\frac{1}{1-\alpha}\mathbb{E}[\max(-Z-b,0)]\}$}
+differentiate the recursion:
 
-\subsection{Coherent Risk Measures}
+$\frac{dS(t_i)}{d\sigma}=\frac{dS(t_{i-1})}{d\sigma}\frac{S(t_i)}{S(t_{i-1})}+S(t_i)\{-\sigma(t_i-t_{i-1})+\sqrt{t_i-t_{i-1}}Z_i\}$.
 
-A risk measure $\rho(Z)$ assigns a numerical value to a random P\&L $Z$. A risk measure $\rho$ is a coherent risk measure, if it satisfies the following properties:
+With $dS(0)/d\sigma=0$,
 
-\noindent \textbf{Monotonicity}: for any $Z_{1}$ and $Z_{2}$ with $Z_{1}\le Z_{2}$, $\rho(Z_{1})\ge\rho(Z_{2})$.
+$\frac{dS(t_i)}{d\sigma}=S(t_i)\left[-\sigma t_i+\sum_{j=1}^i\sqrt{t_j-t_{j-1}}Z_j\right]$.
 
-\noindent \textbf{Translation invariance}: for any constant $m$ and any $Z$, $\rho(Z+m)=\rho(Z)-m$.
+The pathwise Asian vega is
 
-\noindent \textbf{Positive homogeneity}: for any $Z$ and any positive constant $\lambda$, $\rho(\lambda Z)=\lambda\rho(Z)$.
+$e^{-rT}\frac1m\sum_{i=1}^m\frac{dS(t_i)}{d\sigma}\mathbf{1}_{\{\bar S>K\}}$.
 
-\noindent \textbf{Subadditivity}: for any P\&Ls $Z_{1}$ and $Z_{2}$, $\rho(Z_{1}+Z_{2})\le\rho(Z_{1})+\rho(Z_{2})$.
+\subsubsection*{Spread delta and failures}
 
-CVaR is a coherent risk measure. VaR satisfies monotonicity, translation invariance, and positive homogeneity, but not subadditivity; thus, it is not a coherent risk measure.
+For $Y=e^{-rT}[(S_2(T)-S_1(T))-K]^+$,
 
-\subsection{Data-Driven Mean-Risk Portfolio Selection}
+$\frac{\partial Y}{\partial S_2(0)}=e^{-rT}\frac{S_2(T)}{S_2(0)}\mathbf{1}_{\{S_2(T)-S_1(T)>K\}}$,
 
-Suppose that we have observed $T$ samples of $R$, denoted as $R_{t}$, $t=1,...,T$. Assume that the future scenarios are confined to be within these $T$ observed samples, and each has a probability of $1/T$ to occur. This means the distribution of the return rate in the next period is the empirical distribution. Denote the sample mean as:
+$\frac{\partial Y}{\partial S_1(0)}=-e^{-rT}\frac{S_1(T)}{S_1(0)}\mathbf{1}_{\{S_2(T)-S_1(T)>K\}}$.
 
-\centerline{$\overline{R}:=\frac{1}{T}\sum_{t=1}^{T}R_{t}$}
+For digital $Y=e^{-rT}\mathbf{1}_{\{S(T)>K\}}$, the pathwise derivative is $0$ a.s. but $\frac{d}{dS(0)}\mathbb{E}[Y]\ne0$. Discontinuities are the main obstacle; pathwise also misses barrier crossings and simple gamma estimates.
 
-\subsubsection*{Optimization: Mean-Semi-Variance Portfolio Selection}
+\subsection{Likelihood Ratio Method}
 
-The data-driven mean-semi-variance portfolio selection can be formulated as the following quadratic program(no borrowing and no shorting.):
+\subsubsection*{Score estimator}
 
-\centerline{$\min_{w,y_{1},...,y_{T}}\frac{1}{T}\sum_{t=1}^{T}y_{t}^{2}$}
+Let $Y=f(X)$ and $X$ have density $g_\theta$. If differentiation and integration can be interchanged,
 
-\centerline{$\mathrm{s.t.}\quad y_{t}\ge w^{\top}(\overline{R}-R_{t}), \quad t=1,...,T$}
+$\frac{d}{d\theta}\mathbb{E}_\theta[Y]=\mathbb{E}_\theta\left[f(X)\frac{\dot g_\theta(X)}{g_\theta(X)}\right]=\mathbb{E}_\theta\left[f(X)\frac{d}{d\theta}\log g_\theta(X)\right]$.
 
-\centerline{$y_{t}\ge0, \quad t=1,...,T$}
+The score is $\dot g_\theta(X)/g_\theta(X)=d\log g_\theta(X)/d\theta$. LRM handles discontinuous payoffs better than pathwise, but needs a tractable density and can have high variance.
 
-\centerline{$r_{f}+w^{\top}(R-r_{f}1_{n})\ge z$}
+\subsubsection*{Lognormal delta score}
 
-\centerline{$0\le w_{i}\le1, \quad i=1,...,n$}
+For lognormal $S(T)$,
 
-\subsubsection*{Optimization: Mean-Absolute Standard Deviation Portfolio Selection}
+$g(x)=\frac{1}{x\sigma\sqrt T}\phi(\zeta(x)),\qquad \zeta(x)=\frac{\log(x/S(0))-(r-\sigma^2/2)T}{\sigma\sqrt T}$.
 
-The data-driven mean-absolute standard deviation portfolio selection can be formulated as the following linear program(no borrowing and no shorting):
+The $S(0)$ score is
 
-\centerline{$\min_{w,y_{1},...,y_{T}}\frac{1}{T}\sum_{t=1}^{T}y_{t}$}
+$\frac{\partial g(x)/\partial S(0)}{g(x)}=\frac{\log(x/S(0))-(r-\sigma^2/2)T}{S(0)\sigma^2T}$.
 
-\centerline{$\mathrm{s.t.}\quad y_{t}\ge w^{\top}(R_{t}-\overline{R}), \quad t=1,...,T$}
+If $S(T)$ is generated with $Z$, then $\zeta(S(T))=Z$. For any discounted payoff $f(S(T))$, the delta estimator is
 
-\centerline{$y_{t}\ge-w^{\top}(R_{t}-\overline{R}), \quad t=1,...,T$}
+$f(S(T))\frac{Z}{S(0)\sigma\sqrt T}$.
 
-\centerline{$r_{f}+w^{\top}(\overline{R}-r_{f}1_{n})\ge z$}
+Thus for a call use $e^{-rT}(S(T)-K)^+Z/(S(0)\sigma\sqrt T)$; for a digital use $e^{-rT}\mathbf{1}_{\{S(T)>K\}}Z/(S(0)\sigma\sqrt T)$.
 
-\centerline{$0\le w_{i}\le1, \quad i=1,...,n$}
+\subsubsection*{Path scores}
 
-\subsubsection*{Optimization: Mean-CVaR Portfolio Selection}
+For a GBM path,
 
-Suppose the initial wealth is $x_{0}$, so for portfolio $w$, the P\&L is $Z_{w}=x_{0}R_{w}$. Suppose the target for the expected return rate is $z$. The data-driven mean-$\alpha$-CVaR portfolio selection can be formulated as the following linear program:
+$g(x_1,\ldots,x_m)=g_1(x_1\mid S(0))g_2(x_2\mid x_1)\cdots g_m(x_m\mid x_{m-1})$.
 
-\centerline{$\min_{w,y_{1},...,y_{T},b} b+\frac{1}{(1-\alpha)T}\sum_{t=1}^{T}y_{t}$}
+Only the first factor depends on $S(0)$, so the Asian delta score is
 
-\centerline{$\mathrm{s.t.}\quad y_{t}\ge -(r_{f}+w^{\top}(R_{t}-r_{f}1_{n}))x_0 - b, \quad t=1,...,T$}
+$\frac{\partial}{\partial S(0)}\log g(S(t_1),\ldots,S(t_m))=\frac{Z_1}{S(0)\sigma\sqrt{t_1}}$,
 
-\centerline{$y_{t}\ge0, \quad t=1,...,T$}
+and the LRM Asian delta is $e^{-rT}(\bar S-K)^+Z_1/(S(0)\sigma\sqrt{t_1})$. For volatility, every transition contributes:
 
-\centerline{$r_{f}+w^{\top}(\overline{R}-r_{f}1_{n})\ge z$}
+$\frac{\partial}{\partial\sigma}\log g(S(t_1),\ldots,S(t_m))=\sum_{j=1}^m\left(\frac{Z_j^2-1}{\sigma}-Z_j\sqrt{t_j-t_{j-1}}\right)$.
 
-\centerline{$0\le w_{i}\le1, \quad i=1,...,n$}
+\subsubsection*{Multivariate normal score}
 
+If $X\sim N(\mu(\theta),\Sigma)$, then
 
+$\frac{d}{d\theta}\log g_\theta(X)=(X-\mu(\theta))^\top\Sigma^{-1}\dot\mu(\theta)$.
 
-\subsection{Expected Utility}
+If $X=\mu(\theta)+AZ$, $Z\sim N(0,I)$, and $AA^\top=\Sigma$, the score is
 
-Expected utility (EU) theory suggests that when making decisions under risk, people do not evaluate monetary payoffs directly. Instead, they attribute a subjective value (utility) to each monetary payoff. $X$ is evaluated as the expectation of its utility $\mathbb{E}[u(X)]$. With a logarithmic utility $u(x)=\log(x)$, the expected utility of the St. Petersburg game is:
+$\frac{d}{d\theta}\log g_\theta(X)=Z^\top A^{-1}\dot\mu(\theta)$.
 
-\centerline{$\mathbb{E}[u(X)]=\sum_{n=1}^{\infty}(1/2^{n})\times \log(2^{n})=\log~2\times\sum_{n=1}^{\infty}n/2^{n}=\log(4)$}
+If $\theta$ is in $\Sigma$,
 
-This solves the paradox.
+$\frac{d}{d\theta}\log g_\theta(X)=-\frac12\operatorname{tr}(\Sigma^{-1}\dot\Sigma)+\frac12(X-\mu)^\top\Sigma^{-1}\dot\Sigma\Sigma^{-1}(X-\mu)$.
 
-\subsubsection*{Risk Aversion}
+For $d$-asset GBM with $dS_i(t)/S_i(t)=r\,dt+v_i^\top dW(t)$, let $A$ have rows $v_i^\top$ and $\Sigma=AA^\top$. Then
 
-Individuals are risk averse if any random payoff $X$ is less preferred to its mean $\mathbb{E}[X]$. 
-An individual with EU preferences is risk averse if and only if their utility function $u$ is concave. Concavity is equivalent to diminishing sensitivity, meaning the marginal utility $u^{\prime}(x)$ is decreasing.
+$X\sim N(\mu,T\Sigma),\qquad \mu_i=\log S_i(0)+(r-\frac12\|v_i\|^2)T$.
 
-\subsubsection*{Certainty Equivalent}
+For payoff $f(S_1(T),\ldots,S_d(T))$, the LRM delta for asset $i$ is
 
-The certainty equivalent of a random payoff $X$ is the deterministic payoff $c$ that is indifferent to $X$:
+$f(S_1(T),\ldots,S_d(T))\frac{(Z^\top A^{-1})_i}{S_i(0)\sqrt T}$.
 
-\centerline{$u(c)=\mathbb{E}[u(X)]$}
+\subsection{Gamma And Examples}
 
-Individual A is more risk averse than B if the certainty equivalent of $X$ for A is less than or equal to that for B.
+\subsubsection*{LRM gamma}
 
-\subsubsection*{Risk Aversion Coefficient}
+If $\ddot g_\theta$ is the second density derivative, then
 
-The Arrow-Pratt absolute risk aversion coefficient is defined as:
+$f(X)\frac{\ddot g_\theta(X)}{g_\theta(X)}$
 
-\centerline{$-\frac{u^{\prime\prime}(x)}{u^{\prime}(x)}$}
+estimates $d^2\mathbb{E}_\theta[f(X)]/d\theta^2$, under valid derivative-expectation interchanges. For Black-Scholes gamma,
 
-The larger the coefficient, the more concave the utility function and the more risk averse the individual.
+$\frac{d^2g(S(T))/dS^2(0)}{g(S(T))}=\frac{\zeta(S(T))^2-1}{S(0)^2\sigma^2T}-\frac{\zeta(S(T))}{S(0)^2\sigma\sqrt T}$.
 
-\subsubsection*{Equivalent Utility Functions}
+Replace $\zeta(S(T))$ by $Z$ when using the usual GBM simulation. Higher derivatives introduce higher powers and often larger variance. For $X\sim N(\mu,\sigma^2)$,
 
-Preferences remain the same if we replace $u(x)$ with $au(x)+b$ where $a>0$. Thus, $v(x):=au(x)+b$ is equivalent to $u(x)$.
+$\frac{\dot g_\mu(X)}{g_\mu(X)}=\frac{X-\mu}{\sigma^2},\qquad \frac{\ddot g_\mu(X)}{g_\mu(X)}=\frac{(X-\mu)^2-\sigma^2}{\sigma^4}$.
 
-\subsubsection*{Examples of Utility Functions}
+\subsubsection*{Artificial-dynamics control for delta}
 
-Exponential utility ($\gamma>0$):
+For $dS_t=rS_tdt+\theta_tS_tdW_t$, $d\theta_t=a(\Theta-\theta_t)dt+\beta dB_t$, write $S_t=S_0e^{Y_t}$ with
 
-\centerline{$u(x)=1-e^{-\gamma x}, \quad x\in\mathbb{R}$}
+$dY_t=(r-\frac12\theta_t^2)dt+\theta_tdW_t,\qquad Y_0=0$.
 
-Power utility ($\gamma>0,\gamma\ne1$):
+Then call delta is
 
-\centerline{$u(x)=x^{1-\gamma}/(1-\gamma), \quad x>0$}
+$\Delta=\mathbb{E}\left[\mathbf{1}_{\{Y_T\ge y\}}e^{Y_T-rT}\right],\qquad y=\log(K/S_0)$.
 
-Logarithmic utility:
+Use Euler for $(Y,\theta)$ and an artificial constant-volatility process with the same $Z_i$:
 
-\centerline{$u(x)=\ln x, \quad x>0$}
+$\bar Y_{i+1}=\bar Y_i+(r-\frac12\sigma^2)\Delta t_i+\sigma\sqrt{\Delta t_i}Z_{i+1}$.
 
-Quadratic utility ($\gamma>0$):
+The control is $V=\mathbf{1}_{\{\bar Y_T\ge y\}}e^{\bar Y_T-rT}$ with
 
-\centerline{$u(x)=x-\frac{\gamma}{2}x^{2}, \quad x\in\mathbb{R}$}
+$\mathbb{E}[V]=\Phi(\alpha),\qquad \alpha=\frac{1}{\sigma\sqrt T}\log\left(\frac{S_0}{K}\right)+\left(\frac{\sigma}{2}+\frac{r}{\sigma}\right)\sqrt T$.
 
-\subsection{Elicit Utility Function}
+Use output $X-b\{V-\Phi(\alpha)\}$, typically with $\sigma=\Theta$.
 
-\subsubsection*{Certainty Equivalent Method}
-Select reference points $A$ and $B$. Propose lottery $(A, p; B, 1-p)$. Ask for certainty equivalent $c$. Then:
+\subsubsection*{Euler sensitivity recursion}
 
-\centerline{$u(c)=pu(A)+(1-p)u(B)$}
+For $dS_t=rS_tdt+\sigma(S_t)dW_t$ and $V(S_0)=\mathbb{E}[e^{-rT}h(S_T)]$,
 
-$u(A)$ and $u(B)$ are set exogenously due to scaling freedom. Varying $p$ maps the curve.
+$\Delta=\mathbb{E}\left[e^{-rT}h'(S_T)\frac{\partial S_T}{\partial S_0}\right]$.
 
-\subsubsection*{Probability Equivalent Method}
-Select reference points $A$ and $B$. For a value $x$, ask for the probability $p$ such that the individual accepts the lottery in place of $x$. Then:
+Euler simulation:
 
-\centerline{$u(x)=pu(A)+(1-p)u(B)$}
+$\hat S_0=S_0,\qquad \hat S_{i+1}=\hat S_i+r\hat S_i\Delta t_i+\sigma(\hat S_i)\sqrt{\Delta t_i}Z_{i+1}$.
 
-\subsubsection*{Tradeoff Method}
-Compare lotteries $(X,p;r)$ and $(x, p; R)$ with reference outcomes $R>r$. Vary $X$ until indifference. Then compare $(Y,p;r)$ and $(y, p; R)$. By EUT:
+Define $\hat\Delta_i=\partial\hat S_{t_i}/\partial S_0$. Then
 
-\centerline{$u(X)-u(x)=u(Y)-u(y)$}
+$\hat\Delta_0=1,\qquad \hat\Delta_{i+1}=\hat\Delta_i+r\hat\Delta_i\Delta t_i+\sigma'(\hat S_i)\hat\Delta_i\sqrt{\Delta t_i}Z_{i+1}$.
 
-This establishes an indifference relation. Starting from a base $x_0$, one can identify a sequence where $u(x_{j})=ju(x_{1})$.
-
-\subsection{Portfolio Selection with EU in Single Period}
-
-Consider a single period problem with initial wealth $x_{0}$, assets with returns $R_{i}$, and portfolio weights $w_{i}$. Portfolio return is $R_{w}=\sum_{i=1}^{n}w_{i}R_{i}$. Terminal wealth is $x_{0}(1+R_{w})$. The objective is:
-
-\centerline{$\max \mathbb{E}[u(x_{0}(1+R_{w}))]$}
-
-\centerline{$\mathrm{s.t.}\quad \sum_{i=1}^{n}w_{i}=1$}
-
-\subsubsection*{Relation with Mean-Variance Criterion}
-
-For quadratic utility $u(x)=x-(\gamma/2)x^{2}$, the expected utility depends on $\mathbb{E}[R_{w}]$ and $Var[R_{w}]$. Thus, the optimal portfolio must be in the mean-variance set.
-
-Expected utility of terminal wealth:
-
-\centerline{$ x_0 \left\{ \mathbb{E}[1 + R_{\mathbf{w}}] - (\gamma x_0/2)\mathbb{E}[(1 + R_{\mathbf{w}})^2] \right\}$}
-
-\centerline{$ =x_0 \Big\{ 1 - (\gamma x_0/2) + (1 - \gamma x_0)\mathbb{E}[R_{\mathbf{w}}] + (\gamma x_0/2)(\mathbb{E}[R_{\mathbf{w}}])^2 - (\gamma x_0/2)\text{Var}[R_{\mathbf{w}}] \Big\}$}
-
-For exponential utility $u(x)=-e^{-\gamma x}$ and normally distributed returns, the expected utility is:
-
-\centerline{$-\exp\{-\gamma x_{0}(1+\mathbb{E}[R_{w}])+\frac{\gamma}{2}x_{0}^{2}Var(R_{w})\}$}
-
-Thus, the optimal portfolio must be on the mean-variance efficient frontier.
-
-\subsubsection*{General Case}
-In general, EU and mean-variance criteria differ. Using the Lagrange dual method, the optimal portfolio $w^{*}$ satisfies:
-
-\centerline{$\mathbb{E}[u^{\prime}(x_{0}(1+R_{w^{*}}))x_{0}R_{i}]=\lambda, \quad i=1,...,n$}
-
-\centerline{$\mathrm{s.t.}\quad \sum_{i=1}^{n}w_{i}^{*}=1$}
+Estimate delta by averaging $e^{-rT}h'(\hat S_T)\hat\Delta_T$.
