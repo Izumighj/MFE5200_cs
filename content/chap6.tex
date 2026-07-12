@@ -1,0 +1,240 @@
+\section{Mean-Risk Opt and EU Max}
+
+Denote by $R=(R_{1},...,R_{n})^{\top}$ the net return vector of the stocks and $r_{f}$ the risk-free net return rate. Given portfolio $w=(w_{1},...,w_{n})^{\top}$, where $w_{i}$ represents the percentage of initial wealth invested in stock $i$, the net return rate of the portfolio is:
+
+\centerline{$R_{w}=r_{f}+w^{\top}(R-r_{f}1_{n})$}
+
+\subsection{Mean-Semi-variance Model}
+
+One alternative to variance is semi-variance:
+
+\centerline{$\mathbb{E}[(\min(R_{w}-\mathbb{E}[R_{w}],0)^{2})]$}
+
+This measures the downside risk of the portfolio. If the distribution is symmetrical, semi-variance is proportional to variance; in general, it is not the case. The Mean-semi-variance portfolio selection problem is formulated as:
+
+\centerline{$\min_{w} \mathbb{E}[(\min(R_{w}-\mathbb{E}[R_{w}],0)^{2})]$}
+
+\centerline{$\mathrm{s.t.}\quad \mathbb{E}[R_{w}]\ge z$}
+
+\subsection{Mean-Absolute Deviation Model}
+
+Another alternative to variance is absolute deviation:
+
+\centerline{$\mathbb{E}[|R_{w}-\mathbb{E}[R_{w}]|]$}
+
+Mean-absolute deviation portfolio selection is formulated as:
+
+\centerline{$\min_{w} \mathbb{E}[|R_{w}-\mathbb{E}[R_{w}]|]$}
+
+\centerline{$\mathrm{s.t.}\quad \mathbb{E}[R_{w}]\ge z$}
+
+\subsection{Safety-First Model}
+
+Safety-first portfolio selection is formulated as:
+
+\centerline{$\min_{w} \mathbb{P}(R_{w}\le D)$}
+
+\centerline{$\mathrm{s.t.}\quad \mathbb{E}[R_{w}]\ge z$}
+
+Here, $D$ is a given threshold below which the portfolio return is considered to be a disaster. Both the mean-semi-variance and the mean-absolute deviation portfolio selection problems are convex programs, but the safety-first portfolio selection problem is not.
+
+\subsection{Tail Risk Measures}
+
+In the safety-first criterion, investors are concerned about the left tail of the return distribution. 
+
+Given initial wealth $x_{0}$ and a portfolio $w$, the wealth at the end of the period is $X_{T}=x_{0}(1+R_{w})$, and thus the P\&L of the portfolio is:
+
+\centerline{$Z:=X_{T}-x_{0}=x_{0}R_{w}$}
+
+\subsubsection*{Definition of VaR}
+
+Let $Z$ be a random P\&L, with negative values referring to losses and positive values to gains. Given a level $\alpha\in(0,1)$, informally the $\alpha$-VaR, denoted as $VaR_{\alpha}(Z)$, is defined by:
+
+\centerline{$\mathbb{P}(-Z\le VaR_{\alpha}(Z))=\alpha$}
+
+Formally, $VaR_{\alpha}(Z)$ is defined as follows:
+
+\centerline{$VaR_{\alpha}(Z)=\inf\{x\in\mathbb{R}:\mathbb{P}(-Z\le x)\ge\alpha\}$}
+
+\centerline{$=-\sup\{y\in\mathbb{R}:\mathbb{P}(Z<y)\le1-\alpha\}$}
+
+\subsubsection*{Definition of CVaR}
+
+Given a level $\alpha\in(0,1)$, informally the $\alpha$-CVaR, denoted as $CVaR_{\alpha}(Z)$, is defined by:
+
+\centerline{$CVaR_{\alpha}(Z)=\mathbb{E}[-Z|-Z\ge VaR_{\alpha}(Z)]$}
+
+Formally, $CVaR_{\alpha}(Z)$ is defined by:
+
+\centerline{$CVaR_{\alpha}(Z)=\frac{1}{1-\alpha}\int_{\alpha}^{1}VaR_{\beta}(Z)d\beta$}
+
+CVaR can be derived by solving an optimization problem:
+
+\centerline{$CVaR_{\alpha}(Z)=\min_{b}\{b+\frac{1}{1-\alpha}\mathbb{E}[\max(-Z-b,0)]\}$}
+
+\subsection{Coherent Risk Measures}
+
+A risk measure $\rho(Z)$ assigns a numerical value to a random P\&L $Z$. A risk measure $\rho$ is a coherent risk measure, if it satisfies the following properties:
+
+\noindent \textbf{Monotonicity}: for any $Z_{1}$ and $Z_{2}$ with $Z_{1}\le Z_{2}$, $\rho(Z_{1})\ge\rho(Z_{2})$.
+
+\noindent \textbf{Translation invariance}: for any constant $m$ and any $Z$, $\rho(Z+m)=\rho(Z)-m$.
+
+\noindent \textbf{Positive homogeneity}: for any $Z$ and any positive constant $\lambda$, $\rho(\lambda Z)=\lambda\rho(Z)$.
+
+\noindent \textbf{Subadditivity}: for any P\&Ls $Z_{1}$ and $Z_{2}$, $\rho(Z_{1}+Z_{2})\le\rho(Z_{1})+\rho(Z_{2})$.
+
+CVaR is a coherent risk measure. VaR satisfies monotonicity, translation invariance, and positive homogeneity, but not subadditivity; thus, it is not a coherent risk measure.
+
+\subsection{Data-Driven Mean-Risk Portfolio Selection}
+
+Suppose that we have observed $T$ samples of $R$, denoted as $R_{t}$, $t=1,...,T$. Assume that the future scenarios are confined to be within these $T$ observed samples, and each has a probability of $1/T$ to occur. This means the distribution of the return rate in the next period is the empirical distribution. Denote the sample mean as:
+
+\centerline{$\overline{R}:=\frac{1}{T}\sum_{t=1}^{T}R_{t}$}
+
+\subsubsection*{Optimization: Mean-Semi-Variance Portfolio Selection}
+
+The data-driven mean-semi-variance portfolio selection can be formulated as the following quadratic program(no borrowing and no shorting.):
+
+\centerline{$\min_{w,y_{1},...,y_{T}}\frac{1}{T}\sum_{t=1}^{T}y_{t}^{2}$}
+
+\centerline{$\mathrm{s.t.}\quad y_{t}\ge w^{\top}(\overline{R}-R_{t}), \quad t=1,...,T$}
+
+\centerline{$y_{t}\ge0, \quad t=1,...,T$}
+
+\centerline{$r_{f}+w^{\top}(R-r_{f}1_{n})\ge z$}
+
+\centerline{$0\le w_{i}\le1, \quad i=1,...,n$}
+
+\subsubsection*{Optimization: Mean-Absolute Standard Deviation Portfolio Selection}
+
+The data-driven mean-absolute standard deviation portfolio selection can be formulated as the following linear program(no borrowing and no shorting):
+
+\centerline{$\min_{w,y_{1},...,y_{T}}\frac{1}{T}\sum_{t=1}^{T}y_{t}$}
+
+\centerline{$\mathrm{s.t.}\quad y_{t}\ge w^{\top}(R_{t}-\overline{R}), \quad t=1,...,T$}
+
+\centerline{$y_{t}\ge-w^{\top}(R_{t}-\overline{R}), \quad t=1,...,T$}
+
+\centerline{$r_{f}+w^{\top}(\overline{R}-r_{f}1_{n})\ge z$}
+
+\centerline{$0\le w_{i}\le1, \quad i=1,...,n$}
+
+\subsubsection*{Optimization: Mean-CVaR Portfolio Selection}
+
+Suppose the initial wealth is $x_{0}$, so for portfolio $w$, the P\&L is $Z_{w}=x_{0}R_{w}$. Suppose the target for the expected return rate is $z$. The data-driven mean-$\alpha$-CVaR portfolio selection can be formulated as the following linear program:
+
+\centerline{$\min_{w,y_{1},...,y_{T},b} b+\frac{1}{(1-\alpha)T}\sum_{t=1}^{T}y_{t}$}
+
+\centerline{$\mathrm{s.t.}\quad y_{t}\ge -(r_{f}+w^{\top}(R_{t}-r_{f}1_{n}))x_0 - b, \quad t=1,...,T$}
+
+\centerline{$y_{t}\ge0, \quad t=1,...,T$}
+
+\centerline{$r_{f}+w^{\top}(\overline{R}-r_{f}1_{n})\ge z$}
+
+\centerline{$0\le w_{i}\le1, \quad i=1,...,n$}
+
+
+
+\subsection{Expected Utility}
+
+Expected utility (EU) theory suggests that when making decisions under risk, people do not evaluate monetary payoffs directly. Instead, they attribute a subjective value (utility) to each monetary payoff. $X$ is evaluated as the expectation of its utility $\mathbb{E}[u(X)]$. With a logarithmic utility $u(x)=\log(x)$, the expected utility of the St. Petersburg game is:
+
+\centerline{$\mathbb{E}[u(X)]=\sum_{n=1}^{\infty}(1/2^{n})\times \log(2^{n})=\log~2\times\sum_{n=1}^{\infty}n/2^{n}=\log(4)$}
+
+This solves the paradox.
+
+\subsubsection*{Risk Aversion}
+
+Individuals are risk averse if any random payoff $X$ is less preferred to its mean $\mathbb{E}[X]$. 
+An individual with EU preferences is risk averse if and only if their utility function $u$ is concave. Concavity is equivalent to diminishing sensitivity, meaning the marginal utility $u^{\prime}(x)$ is decreasing.
+
+\subsubsection*{Certainty Equivalent}
+
+The certainty equivalent of a random payoff $X$ is the deterministic payoff $c$ that is indifferent to $X$:
+
+\centerline{$u(c)=\mathbb{E}[u(X)]$}
+
+Individual A is more risk averse than B if the certainty equivalent of $X$ for A is less than or equal to that for B.
+
+\subsubsection*{Risk Aversion Coefficient}
+
+The Arrow-Pratt absolute risk aversion coefficient is defined as:
+
+\centerline{$-\frac{u^{\prime\prime}(x)}{u^{\prime}(x)}$}
+
+The larger the coefficient, the more concave the utility function and the more risk averse the individual.
+
+\subsubsection*{Equivalent Utility Functions}
+
+Preferences remain the same if we replace $u(x)$ with $au(x)+b$ where $a>0$. Thus, $v(x):=au(x)+b$ is equivalent to $u(x)$.
+
+\subsubsection*{Examples of Utility Functions}
+
+Exponential utility ($\gamma>0$):
+
+\centerline{$u(x)=1-e^{-\gamma x}, \quad x\in\mathbb{R}$}
+
+Power utility ($\gamma>0,\gamma\ne1$):
+
+\centerline{$u(x)=x^{1-\gamma}/(1-\gamma), \quad x>0$}
+
+Logarithmic utility:
+
+\centerline{$u(x)=\ln x, \quad x>0$}
+
+Quadratic utility ($\gamma>0$):
+
+\centerline{$u(x)=x-\frac{\gamma}{2}x^{2}, \quad x\in\mathbb{R}$}
+
+\subsection{Elicit Utility Function}
+
+\subsubsection*{Certainty Equivalent Method}
+Select reference points $A$ and $B$. Propose lottery $(A, p; B, 1-p)$. Ask for certainty equivalent $c$. Then:
+
+\centerline{$u(c)=pu(A)+(1-p)u(B)$}
+
+$u(A)$ and $u(B)$ are set exogenously due to scaling freedom. Varying $p$ maps the curve.
+
+\subsubsection*{Probability Equivalent Method}
+Select reference points $A$ and $B$. For a value $x$, ask for the probability $p$ such that the individual accepts the lottery in place of $x$. Then:
+
+\centerline{$u(x)=pu(A)+(1-p)u(B)$}
+
+\subsubsection*{Tradeoff Method}
+Compare lotteries $(X,p;r)$ and $(x, p; R)$ with reference outcomes $R>r$. Vary $X$ until indifference. Then compare $(Y,p;r)$ and $(y, p; R)$. By EUT:
+
+\centerline{$u(X)-u(x)=u(Y)-u(y)$}
+
+This establishes an indifference relation. Starting from a base $x_0$, one can identify a sequence where $u(x_{j})=ju(x_{1})$.
+
+\subsection{Portfolio Selection with EU in Single Period}
+
+Consider a single period problem with initial wealth $x_{0}$, assets with returns $R_{i}$, and portfolio weights $w_{i}$. Portfolio return is $R_{w}=\sum_{i=1}^{n}w_{i}R_{i}$. Terminal wealth is $x_{0}(1+R_{w})$. The objective is:
+
+\centerline{$\max \mathbb{E}[u(x_{0}(1+R_{w}))]$}
+
+\centerline{$\mathrm{s.t.}\quad \sum_{i=1}^{n}w_{i}=1$}
+
+\subsubsection*{Relation with Mean-Variance Criterion}
+
+For quadratic utility $u(x)=x-(\gamma/2)x^{2}$, the expected utility depends on $\mathbb{E}[R_{w}]$ and $Var[R_{w}]$. Thus, the optimal portfolio must be in the mean-variance set.
+
+Expected utility of terminal wealth:
+
+\centerline{$ x_0 \left\{ \mathbb{E}[1 + R_{\mathbf{w}}] - (\gamma x_0/2)\mathbb{E}[(1 + R_{\mathbf{w}})^2] \right\}$}
+
+\centerline{$ =x_0 \Big\{ 1 - (\gamma x_0/2) + (1 - \gamma x_0)\mathbb{E}[R_{\mathbf{w}}] + (\gamma x_0/2)(\mathbb{E}[R_{\mathbf{w}}])^2 - (\gamma x_0/2)\text{Var}[R_{\mathbf{w}}] \Big\}$}
+
+For exponential utility $u(x)=-e^{-\gamma x}$ and normally distributed returns, the expected utility is:
+
+\centerline{$-\exp\{-\gamma x_{0}(1+\mathbb{E}[R_{w}])+\frac{\gamma}{2}x_{0}^{2}Var(R_{w})\}$}
+
+Thus, the optimal portfolio must be on the mean-variance efficient frontier.
+
+\subsubsection*{General Case}
+In general, EU and mean-variance criteria differ. Using the Lagrange dual method, the optimal portfolio $w^{*}$ satisfies:
+
+\centerline{$\mathbb{E}[u^{\prime}(x_{0}(1+R_{w^{*}}))x_{0}R_{i}]=\lambda, \quad i=1,...,n$}
+
+\centerline{$\mathrm{s.t.}\quad \sum_{i=1}^{n}w_{i}^{*}=1$}

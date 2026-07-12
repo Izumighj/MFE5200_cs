@@ -1,0 +1,248 @@
+\section{CAPM and Arbitrage Pricing Theory}
+
+\subsection{Market Equilibrium and CAPM model}
+
+\textbf{Market equilibrium}: at equilibrium price
+
+All investors have achieved their goals. Market is clear, demand=supply.
+
+\textbf{Capital asset pricing model (CAPM)}: an equilibrium pricing model in framework of mean-variance analysis. 
+
+\subsubsection*{Assumptions}
+
+Each investor is a price-taker and mean-variance optimizer (although with different risk appetite). Everyone agrees on the probabilistic structure of assets (mean, covariance matrix of future asset prices). There is a unique risk-free rate $r_{f}$ of borrowing and lending that is available to all. Market is frictionless: assets can be traded in any fraction and there is no transaction fee and other fees. The equilibrium price exists.
+
+\subsubsection*{Market Portfolio}
+
+Suppose there are $n$ risky assets in the market with number of shares $N_{i},i=1,...,n$. The current prices are $P_{i},i=1,...,n$.
+
+Total capital: $\sum_{i=1}^{n}N_{i}P_{i}$
+
+Capitalization weight: $\tilde{w}_{M}=(\tilde{w}_{M,1},...,\tilde{w}_{M,n})$
+
+\centerline{$\tilde{w}_{M,i}=\frac{capital~in~asset~i}{total~capital}=\frac{N_{i}P_{i}}{\sum_{i=1}^{n}N_{i}P_{i}},i=1,...,n$}
+
+Market portfolio: portfolio with capitalization weight.
+
+\subsubsection*{Market Portfolio and Tangent Portfolio}
+
+Each investor holds his optimal portfolio which is a mixture of risk-free asset and mutual tangent portfolio. The total assets held by all investors must be the mixture of risk-free asset and tangent portfolio. Under equilibrium, total holding of assets equals total supply. 
+\textcolor{red}{Thus tangent portfolio is market portfolio.}
+
+Suppose there are $J$ investors in the market. Investor $j$ has initial wealth $x_{j}$ and invests in the portfolio $(w_{j,0},(1-w_{j,0})\tilde{w}_{p})$, $j=1,...,J$. The number of shares of the $i$-th risky asset investor $j$ holds is $x_{j}(1-w_{j,0})\tilde{w}_{p,i}/P_{i},i=1,...,n$.
+
+In equilibrium:
+
+\centerline{$(\sum_{j=1}^{J}x_{j}(1-w_{j,0}))\tilde{w}_{p,i}/P_{i}=N_{i}$}
+
+Thus, $\sum_{j=1}^{J}x_{j}(1-w_{j,0})=\sum_{i=1}^{n}N_{i}P_{i}$, and for $i=1,...n$:
+
+\centerline{$\tilde{w}_{p,i}=\frac{N_{i}P_{i}}{\sum_{j=1}^{J}x_{j}(1-w_{j,0})}=\frac{N_{i}P_{i}}{\sum_{i=1}^{n}N_{i}P_{i}}=\tilde{w}_{M,i}, \quad i=1,...,n$}
+
+\subsubsection*{Capital Market Line}
+
+The efficient set is a single straight line starting from the risk-free point and passing through the market portfolio. This line is called capital market line. Mathematically, capital market line states for any efficient portfolio of assets, its return $R$ satisfies:
+
+\centerline{$\mathbb{E}[R]=r_{f}+\frac{\mathbb{E}[R_{M}]-r_{f}}{\sigma_{M}}\sigma$}
+
+where $\mathbb{E}[R]$ and $\sigma$ are the mean and standard deviation of $R$, respectively, and $\mathbb{E}[R_{M}]$ and $\sigma_{M}$ are the mean and standard deviation of the return of the market portfolio.
+
+A short proof:
+Efficient portfolio $(w_{0},(1-w_{0})\tilde{w}_{M})$; its expected return is:
+
+\centerline{$\mathbb{E}[R]=w_{0}r_{f}+(1-w_{0})\mathbb{E}[R_{M}]=r_{f}+(\mathbb{E}[R_{M}]-r_{f})(1-w_{0})$}
+
+and its deviation is:
+
+\centerline{$\sigma=|1-w_{0}|\sigma_{M}$}
+
+Thus, we obtain the capital market line (assuming $\overline{r}_{M}\ge r_{f}$). Capital market line is the efficient frontier.
+
+\subsubsection*{Derivation of Asset Pricing}
+
+Consider asset/portfolio $i$ with return $R_{i}$, and denote its expectation and standard deviation as $\mathbb{E}[R_{i}]$ and $\sigma_{i}$, respectively. Consider the mean-variance problem with $z=\mathbb{E}[R_{i}]$. The optimal portfolio is:
+
+\centerline{$\begin{bmatrix}w_{0}\\ (1-w_{0})\tilde{w}_{M}\end{bmatrix}$}
+
+with $1-w_{0}=\frac{\mathbb{E}[R_{i}]-r_{f}}{\mathbb{E}[R_{M}]-r_{f}}$.
+
+For any $\epsilon\in\mathbb{R}$, consider the portfolio which is mixture of $(1-\epsilon)$ of the optimal portfolio and $\epsilon$ of asset $i$. This new portfolio is feasible with expected return $z$ and its standard deviation is:
+
+\centerline{$Var((1-\epsilon)w_{0}r_{f}+(1-\epsilon)(1-w_{0})R_{M}+\epsilon R_{i})$}
+
+\centerline{$=(1-\epsilon)^{2}(1-w_{0})^{2}Var(R_{M})+2\epsilon(1-\epsilon)(1-w_{0})cov(R_{i},R_{M}) +\epsilon^{2}Var(R_{i})$}
+
+\centerline{$=:f(\epsilon)$}
+
+0 is the minimum point of $f(\cdot)$ because $(w_{0};(1-w_{0})\tilde{w}_{M})$ is in the minimum-variance set.
+
+\subsubsection*{Capital Asset Pricing Model (CAPM)}
+
+First-order condition:
+
+\centerline{$0=f^{\prime}(0)=-2(1-w_{0})^{2}Var(R_{M})+2(1-w_{0})cov(R_{i},R_{M})$}
+
+leads to:
+
+\centerline{$1-w_{0}=\frac{cov(R_{i},R_{M})}{Var(R_{M})}$}
+
+Capital asset pricing model (CAPM):
+
+\centerline{$\mathbb{E}[R_{i}]-r_{f}=\beta_{i}(\mathbb{E}[R_{M}]-r_{f})$}
+
+where
+
+\centerline{$\beta_{i}=\frac{cov(R_{i},R_{M})}{Var(R_{M})}$}
+
+\centerline{$\mathbb{E}[R]-r_{f}=\beta(\mathbb{E}[R_{M}]-r_{f})$}
+
+draws security market line on $(\beta,\mathbb{E}[R])$ plane.
+
+$\beta_{i}$ is referred to as the beta of the asset. $\mathbb{E}[R_{i}]-r_{f}$ is termed as expected excess rate of return of asset $i$; $\mathbb{E}[R_{M}]-r_{f}$ is the expected excess rate of return of market portfolio.
+
+CAPM says expected excess return of an asset is proportional to expected excess return of market portfolio. The proportion is its beta ($\beta$). 
+
+$\beta>0$, i.e., positively correlated; positive expected excess return.
+
+$\beta=0$, i.e., uncorrelated; zero expected excess return.
+
+$\beta<0$, i.e., negatively correlated; negative expected excess return.
+
+It is $\beta$ rather than $\sigma$ that contributes to expected excess return.
+
+\subsubsection*{Economic Interpretation of CAPM}
+
+Consider the portfolio consisting of market portfolio, $\epsilon$ of asset $i$, and $-\epsilon$ of risk-free asset, the last two components being a zero cost trading strategy with P\&L $\epsilon(R_{i}-r_{f})$. The variance of the portfolio is:
+
+\centerline{$Var(R_{M})+2\epsilon cov(R_{i},R_{M})+\epsilon^{2}Var(R_{i})$}
+
+When $\epsilon<<1$, second term dominates third term.
+If $cov(R_{i},R_{M})=0$, asset $i$ does not affect the variance, just like risk-free asset; thus it has zero risk premium.
+If $cov(R_{i},R_{M})>0$, asset $i$ increases the variance; thus it has positive risk premium.
+If $cov(R_{i},R_{M})<0$, asset $i$ reduces the variance; thus it has negative risk premium.
+
+Key insight: risk is the variance of the portfolio return, not the variance of any single asset's return.
+
+\subsubsection*{Decompose the Risk}
+
+For any asset $i$ with (random) return $R_{i}$, define $\epsilon_{i}$ via:
+
+\centerline{$R_{i}-r_{f}=\beta_{i}(R_{M}-r_{f})+\epsilon_{i}$}
+
+By CAPM, $\mathbb{E}[\epsilon_{i}]=0$. By the definition of $\beta_{i}$:
+
+\centerline{$cov(R_{M},\epsilon_{i})=cov(R_{M},R_{i}-r_{f}-\beta_{i}(R_{M}-R_{f}))$}
+
+\centerline{$=cov(R_{M},R_{i}-r_{f})-cov(R_{M},\beta_{i}R_{M}-\beta_{i}r_{f})$}
+
+\centerline{$=cov(R_{M},R_{i})-\beta_{i}cov(R_{M},R_{M})=0$}
+
+The risky return $R_{i}$ can be decomposed into two parts: the part comoves with market return and the part uncorrelated with market return. As a result:
+
+\centerline{$\sigma_{i}^{2}=cov(\beta_{i}(R_{M}-r_{f})+\epsilon_{i},\beta_{i}(R_{M}-r_{f})+\epsilon_{i})=\beta_{i}^{2}\sigma_{M}^{2}+Var(\epsilon_{i})$}
+
+The first term, $\beta_{i}^{2}\sigma_{M}^{2}$ is called \textcolor{red}{systematic risk}; The second term, $Var(\epsilon_{i})$, is called \textcolor{red}{nonsystematic, idiosyncratic, or specific risk}. Only the systematic risk contributes to expected return according to CAPM. Any asset or portfolio on capital market line (efficient frontier) has only systematic risk. Any asset or portfolio below capital market line has nonsystematic risk.
+
+
+
+\subsubsection*{CAPM as a Pricing Formula}
+
+Certainty equivalent pricing formula: The price $P$ of an asset with payoff $Q$ is:
+
+\centerline{$P=\frac{1}{1+r_{f}}[\mathbb{E}[Q]-\frac{cov(Q,R_{M})(\mathbb{E}[R_{M}]-r_{f})}{Var(R_{M})}]$}
+
+Pricing form of CAPM: The price $P$ of an asset with payoff $Q$ (random variables) is:
+
+\centerline{$P=\frac{\mathbb{E}[Q]}{1+r_{f}+\beta(\mathbb{E}[R_{M}]-r_{f})}$}
+
+First formula is used when the correlation of future payoff with market portfolio is known. Second formula is used when $\beta$ is known a priori.
+
+\subsubsection*{Example: The Oil Venture}
+
+Example 7.6 (The oil venture) Consider the possiblity of investing in a share of a certain oil well that will produce a payoff that is random. The expected payoff is \$1,000 and the standard deviation of return is a relatively high 40\%. The beta of the asset is $\beta=.6$. The risk-free rate is $r_{f}=10\%$, and the expected return of the market portfolio is .17. What is the value of this share of the oil venture, based on CAPM? From the pricing formula, we have:
+
+\centerline{$P=\frac{\mathbb{E}[Q]}{1+r_{f}+\beta(\mathbb{E}[R_{M}]-r_{f})}=\frac{\$1,000}{1+0.1+0.6\times(0.17-0.1)}=\$876$}
+
+\subsubsection*{Example: ABC Fund Analysis}
+
+Example 7.4 (ABC fund analysis) The ABC mutual fund has a 10-year record of rates of return. We would like to evaluate this fund's performance in terms of mean-variance portfolio theory and the CAPM.
+
+Step 1 Estimate $\mu:=\mathbb{E}[R]$, $r_{f}$, $\mu_{M}:=\mathbb{E}[R_{M}]$, and $\beta$ from the data:
+
+\centerline{$\hat{\mu}=\frac{1}{n}\sum_{i=1}^{n}R^{i}, \quad \hat{\mu}_{M}=\frac{1}{n}\sum_{i=1}^{n}R_{M}^{i}, \quad \hat{r}_{f}=\frac{1}{n}\sum_{i=1}^{n}r_{f}^{i}$}
+
+\centerline{$cov(\hat{R,R}_{M})=\frac{1}{n-1}\sum_{i=1}^{n}(R^{i}-\hat{\mu})(R_{M}^{i}-\hat{\mu}_{M})$}
+
+\centerline{$Var(R_{M})=\frac{1}{n-1}\sum_{i=1}^{n}(R_{M}^{i}-\hat{\mu}_{M})^{2}$}
+
+\centerline{$\hat{\beta}=\frac{cov(R,R_{M})}{Var(R_{M})}$}
+
+Step 2 We write the formula:
+
+\centerline{$\hat{\mu}-\hat{r}_{f}=J+\hat{\beta}(\hat{\mu}_{M}-\hat{r}_{f})$}
+
+If ABC fund is priced according to CAPM, $J$ should be zero statistically. $J$ is known as Jensen's index or alpha ($\alpha$). For ABC fund, $J>0$. If you are a CAPM believer, you may think ABC fund is underpriced and thus a good asset. If you are market efficiency believer, you may think CAPM is invalid.
+
+Step 3 Find the estimate of the Sharpe ratio:
+
+\centerline{$S:=\frac{\hat{\mu}-\hat{r}_{f}}{\hat{\sigma}}$}
+
+where
+
+\centerline{$\hat{\sigma}^{2}=\frac{1}{n-1}\sum_{i=1}^{n}(R^{i}-\hat{\mu})^{2}$}
+
+For ABC fund, $S=0.436$. For S\&P 500, $S=0.467$. If you are a CAPM believer, you may think ABC fund is not efficient.
+
+\subsubsection*{Testing CAPM Using Linear Regression}
+
+Suppose there are $n$ risky assets in the market with return rates in the following period to be $R_{i}$, $i=1,...,n$. Suppose the returns of the risk-free asset and of the market portfolio in the following period are $r_{f}$ and $r_{M}$, respectively.
+
+Decomposition:
+
+\centerline{$R_{i}-r_{f}=\alpha_{i}+\beta_{i}(R_{M}-r_{f})+\epsilon_{i}, \quad i=1,...,n$}
+
+where $\epsilon_{i}$ are independent of each other and of $r_{M}$.
+
+Vector form:
+
+\centerline{$\vec{R}-r_{f}\vec{1}_{n}=\pmb{\alpha}+\pmb{\beta}(R_{M}-r_{f})+\pmb{\epsilon}$}
+
+where $\vec{R}:=(R_{1},...,R_{n})^{\top}$, $\pmb{\alpha}:=(\alpha_{1},...,\alpha_{n})^{\top}$, $\pmb{\beta}:=(\beta_{1},...,\beta_{n})^{\top}$, and $\pmb{\epsilon}:={(\epsilon_{1},...,\epsilon_{n})}^{T}$. $\pmb{\epsilon}$ is independent of $R_{M}$.
+
+CAPM holds if and only if $\pmb{\alpha}=0$. To test whether CAPM holds, suppose we have historical data of the asset returns: $R_{t}$, $R_{M,t}$, $r_{f,t}$, $t=1,...,T$. Suppose the asset returns in different periods are i.i.d. Run vector linear regression to estimate $\alpha$ and $\beta$. Reject CAPM if the estimate of $\alpha$ is significantly different from zero.
+
+
+\subsection{Arbitrage Pricing Theory}
+
+\subsubsection*{A Multi-Factor Model}
+
+Fix one period and consider $n$ zero-cost strategies in this period with payoffs $\tilde{r}_{1},...,\tilde{r}_{n}$, respectively. Assume the following factor model:
+
+\centerline{$\tilde{r}_{i}=\alpha_{i}+\sum_{k=1}^{m}\beta_{i,k}f_{k}+\epsilon_{i}, \quad i=1,...,n$}
+
+where $f_{k}$, $k=1,...,m$ are $m$ common factors that are payoffs of $m$ zero-cost strategies. $\epsilon_{i}$ represent idiosyncratic risk, i.e., $\mathbb{E}[\epsilon_{i}]=0$, $cov(\epsilon_{i},f_{k})=0$, and $cov(\epsilon_{i},\epsilon_{j})=0$ $i=1,...,n$, $j=1,...,n$ $k=1,...,m$, and $i\ne j$. $\beta_{i,k}$ is the loading of asset $i$ on factor $k$. $\alpha_{i}$ are constants.
+
+Example: CAPM ($m=1$). $f=R_{M}-r_{f}$, $\tilde{r}_{i}=R_{i}-r_{f}$, $\alpha_{i}=0$.
+
+Example: Fama-French three-factor model ($m=3$). $f_{1}=R_{M}-r_{f}$. $f_{2}$, usually denoted as SMB, is the difference in the returns of two portfolios that are related to the so-called size premium. $f_{3}$, usually denoted as HML, is the difference in the returns of two portfolios that are related to the so-called value premium.
+
+Vector form of the factor model:
+
+\centerline{$\tilde{\vec{r}}=\pmb{\alpha}+\pmb{\beta} \vec{f}+\pmb{\epsilon}$}
+
+where $\vec{f}:=(f_{1},...,f_{m})^{\top}$, $\pmb{\beta}:=\{\beta_{i,j}\}$, $\pmb{\epsilon}:={(\epsilon_{1},...,\epsilon_{n})}^{T}$, $\pmb{\alpha}:=(\alpha_{1},...,\alpha_{n})^{\top}$.
+
+\subsubsection*{Arbitrage Pricing Theory (APT)}
+
+Theorem (Arbitrage Pricing Theory (APT)): Assume there is no arbitrage opportunity in the market. Then, $\alpha=0$. In consequence,
+
+\centerline{$\mathbb{E}[\tilde{r}]=\beta\mathbb{E}[f]$}
+
+$\mathbb{E}[f]$ is the risk premium of the common factors. The risk premium of asset $i$ is its loading on the common factors multiplied by the risk premia of the common factors.
+
+In CAPM, the only factor is the excess return of the market portfolio, $R_{M}-r_{f}$. The risk premium of the common factor is the expected excess return of the market portfolio, $\mathbb{E}[R_{M}]-r_{f}$. The loading of asset $i$ on the common factor is its beta.
+
+
+\subsubsection*{Statistical Testing of APT}
+
+Suppose we have historical data of the payoffs of the $n$ zero-cost strategies: $\tilde{r}_{t}$, $t=1,...,T$ and the historical data of the payoffs of the $m$ factors: $f_{t},t=1,...,T$. Suppose the payoffs are i.i.d. across periods. Run multiple linear regression to estimate $\alpha$ and $\beta$. Reject APT if the estimate of $\alpha$ is significantly different from zero.

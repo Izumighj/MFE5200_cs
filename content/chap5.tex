@@ -1,0 +1,161 @@
+\section{Mean-variance and Optimization}
+\subsection{Portfolio Constraints}
+
+\subsubsection*{Review: Markowitz Mean-Variance Problem}
+Recall the standard Markowitz Mean-Variance Problem:
+
+\centerline{$ \min_{w_0, w} \quad \frac{1}{2}w^{\top}Cw $}
+
+\centerline{$\mathrm{s.t.}\quad w_{0}r_{f} + w^{\top}\mu = z $}
+
+\centerline{$
+w_{0} + w^{\top}\mathbf{1}_{n} = 1
+$}
+
+where $w_0$ is the weight in the risk-free asset, $w$ is the vector of weights in risky assets, $C$ is the covariance matrix, and $\mu$ is the expected return vector.
+
+\noindent \textbf{Equivalent formulation}:
+
+\centerline{$
+\min_{w} \quad \frac{1}{2}w^{\top}Cw
+$}
+
+\centerline{$
+\mathrm{s.t.}\quad w^{\top}(\mu - r_{f}\mathbf{1}_{n}) = z - r_{f}
+$}
+
+The above formulation does not take into accounts of constraints in real trading.
+
+\subsubsection*{Basic Trading Constraints}
+
+\noindent \textbf{No Short selling}: $w_{i} \ge 0$, for $i=1, \dots, n$. \\
+\noindent \textbf{No borrowing}: $w_{0} \ge 0$, which implies $\sum_{i=1}^{n}w_{i} \le 1$.
+
+
+\subsubsection*{Margin Requirement for Short Sale}
+
+Suppose that for stock $i$, the short sale of account of this stock should have $(1+m_{i})$ of the value of the short sale. Suppose the margin account earns a deterministic net return rate $r_{c}$. Denote by $v_{i}$ the amount of margin prepared for the short sale of stock $i$, and denote $v := (v_{1}, \dots, v_{n})$.
+
+\noindent \textbf{Portfolio Net Return}:
+
+\centerline{$
+R_{(w,v)} = w^{\top}R + v^{\top}r_{c}\mathbf{1}_{n} + (1 - w^{\top}\mathbf{1}_{n} - v^{\top}\mathbf{1}_{n})r_{f}
+$}
+
+\centerline{$
+\Rightarrow R_{(w,v)} = r_{f} + w^{\top}(R - r_{f}\mathbf{1}_{n}) + v^{\top}(r_{c} - r_{f})\mathbf{1}_{n}
+$}
+
+\noindent \textbf{Moments}:
+Variance is given by $\text{Var}(R_{(w,v)}) = w^{\top}Cw$. Expectation is given by 
+
+\centerline{$
+\mathbb{E}[R_{(w,v)}] = r_{f} + w^{\top}(\mu - r_{f}\mathbf{1}_{n}) + v^{\top}(r_{c} - r_{f})\mathbf{1}_{n}
+$}
+
+\noindent \textbf{Constraints}:
+Constraints to model margin requirements:
+
+\centerline{$
+v_{i} \ge -(1+m_{i})w_{i}, \quad v_{i} \ge 0, \quad i=1, \dots, n.
+$}
+
+\subsubsection*{Cardinality Constraints}
+Due to various forms of market friction, most investors can invest in only a limited number of assets, leading to cardinality constraints. Suppose one can invest in at most $s$ stocks. The cardinality constraint can be formulated as the following linear constraints:
+
+\centerline{$
+-M\delta_{i} \le w_{i} \le M\delta_{i}, \quad \delta_{i} \in \{0,1\}, \quad i=1, \dots, n
+$}
+
+\centerline{$
+\sum_{i=1}^{n}\delta_{i} \le s
+$}
+
+where $M$ is a given, sufficiently large number, and $\delta_{i}$ denotes whether one invests in stock $i$.
+
+\subsubsection*{Buy-In Threshold Constraints}
+Small positions have very limited impact on the total performance of the portfolio, but trigger non-negligible establishing and maintaining cost. To avoid small positions, one can impose a buy-in threshold constraint to prevent from holding an active position less than a prescribed proportion $w_{\min} > 0$ of the total capital.
+The buy-in threshold constraint can be modeled as the following linear constraints:
+
+\centerline{$
+w_{i} \le M\delta_{i}, \quad w_{\min}\delta_{i} \le w_{i}, \quad \delta_{i} \in \{0,1\}, \quad i=1, \dots, n
+$}
+
+where $M$ is a given, sufficiently large number.
+
+\subsubsection*{Diversification Constraints}
+Suppose that the $n$ stocks are divided into $K$ sectors, and $S_{k}$ is the collection of the identities of stocks in section $k$, $k=1, \dots, K$. Suppose that the investor wants to invest in at least $K_{\min}$ sectors, and for each sector she wants to invest, the minimum predefined level of investment is $s_{\min}$.
+The above diversification constraint can be modeled as the following linear constraints:
+\centerline{$
+\sum_{k=1}^{K}\zeta_{k} \ge K_{\min}
+$}
+\centerline{$
+s_{\min}\zeta_{k} \le \sum_{i \in S_{k}}w_{i} \le M\zeta_{k}, \quad k=1, \dots, K
+$}
+
+where $M$ is a given, sufficiently large number.
+
+\subsubsection*{Proportional Transaction Costs and Bid-Ask Spread}
+Suppose that there is a proportional transaction cost that amounts to $c_{v,b}$ dollars for each dollar invested in a stock, and a similar cost $c_{v,s}$ when selling the stock at the end of the period. For simplicity, suppose short sales are not allowed.
+Let $w_{i}$ represent the proportion of the initial capital, pre-transaction cost, invested in stock $i$.
+Proportional transaction costs can be taken into account by modifying the net return rate of a stock $R_{i}$, which is computed from the stock price directly, as follows:
+
+\centerline{$
+R_{i}^{\prime} := \frac{1-c_{v,s}}{1+c_{v,b}}(1+R_{i}) - 1
+$}
+
+To take into account the bid-ask spread, one only needs to use the ask price at the beginning of the period and the bid price at the end of the period to compute the net return rate $R_{i}$.
+
+\subsection{Relative Entropy Model}
+Suppose that the agent is uncertain about the model, which is represented by the probability density function of the excess return of the risky assets. The agent has a reference model $f_{0}$ but considers alternative models $f$.
+Consider the log likelihood ratio of an alternative model $f$ and the reference model $f_{0}$ based on observed asset returns $X_{t}$:
+
+\centerline{$
+R(X_{1}, \dots, X_{T}) = \sum_{t=1}^{T} \log(f(X_{t})/f_{0}(X_{t}))
+$}
+
+By the law of large numbers, under the model $f$:
+
+$\lim_{T \to \infty} \frac{1}{T}R(X_{1}, \dots, X_{T}) = \mathbb{E}^{f}[\log(f(X_{t})/f_{0}(X_{t}))]$
+
+$= \mathbb{E}^{f_{0}}[f(X_{t})/f_{0}(X_{t})\log(f(X_{t})/f_{0}(X_{t}))]$
+
+The term $\mathbb{E}^{f_{0}}[f(X_{t})/f_{0}(X_{t})\log(f(X_{t})/f_{0}(X_{t}))]$ is called the relative entropy of the model $f$ with respect to the reference model $f_{0}$.
+
+The agent faces the following problem:
+
+\centerline{$ 
+\min_{f \in \mathcal{P}} \max_{w} \left[ \lambda w^{\top}\mathbb{E}^{f}[X] - \frac{1}{2}w^{\top}\text{Var}^{f}(X)w \right]
+$}
+
+where $X$ stands for the excess return vector of the risky assets and $\text{Var}^{f}$ stands for the variance under $f$, and
+
+\centerline{$ \displaystyle \mathcal{P} := \{f \mid \mathbb{E}^{f_{0}}[f(X_{t})/f_{0}(X_{t})\log(f(X_{t})/f_{0}(X_{t}))] \le \eta\}$}
+
+for some positive parameter $\eta$.
+
+Assume that the excess return vector follows joint normal distribution. Assume that the covariance matrix $C$ is known, and alternative model $f$ differs from the reference model $f_{0}$ in the mean. Denote the mean under $f$ and $f_{0}$ as $\mu$ and $\mu_{0}$, respectively. Then, the relative entropy of $f$ is:
+
+\centerline{$ \displaystyle \mathbb{E}^{f_{0}}[f(X_{t})/f_{0}(X_{t})\log(f(X_{t})/f_{0}(X_{t}))] = \frac{1}{2}(\mu - \mu_{0})^{\top}C^{-1}(\mu - \mu_{0})$}
+
+The agent's problem becomes:
+
+\centerline{$ \min_{(\mu - \mu_{0})^{\top}C^{-1}(\mu - \mu_{0}) \le 2\eta} \max_{w} \left[ \lambda w^{\top}\mu - \frac{1}{2}w^{\top}Cw \right]$}
+
+\noindent \textbf{Optimal solution}:
+
+If $\mu_{0}^{\top}C^{-1}\mu_{0} \le 2\eta$, then $w^{*} = 0$.
+
+If $\mu_{0}^{\top}C^{-1}\mu_{0} > 2\eta$, then
+$w^{*} = \lambda \left( 1 - \sqrt{\frac{2\eta}{\mu_{0}^{\top}C^{-1}\mu_{0}}} \right) C^{-1}\mu_{0}$
+
+\subsection{A Smooth-Ambiguity Model}
+The worst-case mean-variance portfolio selection is usually too conservative. We consider the smooth-ambiguity model, in which the investor has a belief of the model/parameters for the stock distributions, considers the average model/parameter setup instead of the worst-case scenario, and is averse to ambiguity about the model/parameters.
+
+Formally, denote by $P=(\mu, C)$ a model specification. The investor has a belief of $P$, represented by distribution $\pi$. Let $\overline{P} = (\overline{\mu}, \overline{C}) = \mathbb{E}_{\pi}[P]$ be the average model specification.
+The portfolio selection can be formulated as:
+
+\centerline{$ \displaystyle \max_{w} \mathbb{E}_{\overline{P}}[R_{w}] - \frac{\lambda}{2}\text{Var}_{\overline{P}}(R_{w}) - \frac{\theta}{2}\text{Var}_{\pi}(\mathbb{E}_{P}[R_{w}])$}
+
+where $\lambda > 0$ is the risk aversion parameter and $\theta > 0$ is the ambiguity aversion parameter.
+

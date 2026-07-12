@@ -1,0 +1,71 @@
+\section{Limit Order Book}
+
+\subsection{Bid, Ask, and Mid Prices}
+
+The lowest price among all sell limit orders is referred to as ask price.
+
+The highest price among all buy limit orders is referred to as bid price.
+
+The difference between the bid and ask prices is referred to as bid-ask spread. The average of the bid and ask prices is mid price.
+
+\subsection{Resolution Parameters}
+
+In general, an order $x=(p_{x},\omega_{x},t_{x})$ submitted at time $t_{x}$ with price $p_{x}$ and size $\omega_{x}>0$ (respectively, $\omega_{x}<0)$ is a commitment to sell (respectively, buy) up to $|\omega_{x}|$ units of the traded at a price no less than (respectively, no greater than) $p_{x}$.
+
+The lot size $\sigma$ of an LOB is the smallest amount of the asset that can be traded within it. All orders must arrive with a size $\omega_{x}\in\{\pm k\sigma:k=1,2,...\}$.
+
+The tick size $\pi$ of an LOB is the smallest permissible price interval between different orders within it. All orders must arrive with a price that is specified to the accuracy of $\pi$.
+
+The lot size $\sigma$ and tick size $\pi$ of an LOB are collectively called its resolution parameters.
+
+\subsection{Limit Order Book}
+
+An LOB $\mathcal{L}(t)$ is the set of all active orders in a market at time $t$. The active orders in an LOB $\mathcal{L}(t)$ can be partitioned into the set of active buy orders $\mathcal{B}(t)$, for which $\omega_{x}<0$, and the set of active sell orders $\mathcal{A}(t)$, for which $\omega_{x}>0$.
+
+\subsection{Depth}
+
+The bid-side depth available at price $p$ and at time $t$ is
+
+\centerline{$n^{b}(p,t):=\sum_{\{x\in\mathcal{B}(t):p_{x}=p\}}\omega_{x}$}
+
+The ask-side depth available at price $p$ and at time $t$, denoted $n^{a}(p,t)$, is defined similarly using $\mathcal{A}(t)$.
+
+The bid price at time $t$ is the highest stated price among all active buy orders at time $t$, i.e.,
+
+\centerline{$b(t):=\max_{x\in\mathcal{B}(x)}p_{x}$}
+
+The ask price at time $t$ is the lowest stated price among all active sell orders at time $t$, i.e.,
+
+\centerline{$a(t):=\min_{x\in\mathcal{A}(x)}p_{x}$}
+
+\subsection{Relative Price}
+
+The bid-ask spread at time $t$ is $s(t):=a(t)-b(t)$. The mid price at time $t$ is $m(t):=[a(t)+b(t)]/2$.
+
+For a given price $p$, the bid-relative price is $\delta^{b}(p):=b(t)-p$ and the ask-relative price is $\delta^{a}(p):=p-a(t)$.
+
+For a given order $x=(p_{x},\omega_{x},t_{x})$, the relative price of the order is $\delta_{x}:=\delta^{b}(p_{x})$ if the order is a buy order, and $\delta_{x}:=\delta^{a}(p_{x})$ if the order is a sell order.
+
+The bid-side depth available at relative price $\delta$ and at time $t$ is
+
+\centerline{$N^{b}(\delta,t)=\sum_{\{x\in\mathcal{B}(t):\delta^{x}=\delta\}}\omega_{x}$}
+
+The ask-side is defined similarly.
+
+\subsection{Price changes in LOBs}
+
+Consider a buy (respectively, sell) order $x=(p_{x},\omega_{x},t_{x})$ that arrives immediately after time $t$. If $p_{x}\le b(t)$ (respectively, $p_{x}\ge a(t)$), then $x$ is a limit order that becomes active upon arrival. It does not cause $b(t)$ or $a(t)$ to change.
+
+If $b(t)<p_{x}<a(t)$, then $x$ is a limit order that becomes active upon arrival. Upon arrival, $b(t_{x})=p_{x}$ (respectively, $a(t_{x})=p_{x})$.
+
+If $p_{x}\ge a(t)$ (respectively, $p_{x}\le b(t)$), then $x$ is a market order that immediately matches to one or more active sell (respectively, buy) orders upon arrival. Whenever such a matching occurs, it does so at the price of the active order, which is not necessarily equal to the price of the incoming order. Whether or not such a matching causes $a(t)$ (respectively, $b(t))$ to change at time $t_{x}$ depends on $n^{a}(a(t),t)$ (respectively, $n^{b}(b(t),t))$ and $\omega_{x}$.
+
+In particular, the new bid price $b(t_{x})$ upon arrival of a sell market order $x$ is
+
+\centerline{$b(t_{x}) = \max(p_{x},q)$, where $q=\text{argmax}_{k^{\prime}}^{k=b(t)}|n^{b}(k,t)|>|\omega_{x}|$}
+
+Similarly, the new ask price $a(t_{x})$ upon arrival of a buy market order $x$ is
+
+\centerline{$a(t_{x}) = \min(p_{x},q)$, where $q=\text{argmin}_{k^{\prime}}\sum_{k=a(t)}^{k^{\prime}}|n^{a}(k,t)|>|\omega_{x}|$}
+
+Put another way, the incoming order $x$ matches to the highest priority active order $y$ of opposite type.

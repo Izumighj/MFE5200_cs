@@ -1,0 +1,204 @@
+\section{Sample Final Exam Paper}
+
+\subsubsection*{Question 1}
+
+Consider P\&L $Z$ with the following distribution:
+
+\centerline{$\mathbb{P}(Z=-12)=0.01, \mathbb{P}(Z=-6)=0.02, \mathbb{P}(Z=-4)=0.01,\mathbb{P}(Z=-1)=0.02$}
+
+\centerline{$\mathbb{P}(Z=0)=0.5, \mathbb{P}(Z=1)=0.24,\mathbb{P}(Z=3)=0.2$}
+
+
+Compute the 95\%-VaR, the 95\% CVaR, the expected loss conditional on the loss being larger than or equal to the 95\%-VaR, and the expected loss conditional on the loss being strictly larger than the 95\%-VaR.
+
+\subsubsection*{\textcolor{red}{Solution 1}}
+
+We compute the CDF of $Z$, denoted as $F_{-Z}(x)$. Calculation yields:
+
+\centerline{$F_{-Z}(x) = \begin{cases} 0, & x < -3, \\ 0.2, & x \in [-3, -1), \\ 0.44, & x \in [-1, 0), \\ 0.94, & x \in [0, 1), \\ 0.96, & x \in [1, 4), \\ 0.97, & x \in [4, 6), \\ 0.99, & x \in [6, 12), \\ 1, & x \ge 12. \end{cases}$}
+
+As a result, we have:
+
+\centerline{$VaR_{\alpha}(Z) = \inf\{x \in \mathbb{R} : \mathbb{P}(-Z \le x) \ge \alpha\} = \inf\{x \in \mathbb{R} : F_{-Z}(x) \ge \alpha\}$}
+
+Specifically for different $\alpha$:
+
+\centerline{$VaR_{\alpha}(Z) = \begin{cases} -3, & \alpha \in (0, 0.2], \\ -1, & \alpha \in (0.2, 0.44], \\ 0, & \alpha \in (0.44, 0.94], \\ 1, & \alpha \in (0.94, 0.96], \\ 4, & \alpha \in (0.96, 0.97], \\ 6, & \alpha \in (0.97, 0.99], \\ 12, & \alpha \in (0.99, 1). \end{cases}$}
+
+Consequently, $VaR_{95\%}(Z)=1$.
+
+The 95\% CVaR is calculated as:
+
+\centerline{$CVaR_{95\%}(Z) = \frac{1}{1-0.95}\int_{0.95}^{1}VaR_{\beta}(Z)d\beta$}
+
+\centerline{$= \frac{1}{0.05} \times [1 \times 0.01 + 4 \times 0.01 + 6 \times 0.02 + 12 \times 0.01]= 5.8$}
+
+
+The expected loss conditional on the loss being larger than or equal to the 95\%-VaR ($VaR_{95\%}=1$) is:
+
+\centerline{$\mathbb{E}[-Z \mid -Z \ge VaR_{95\%}(Z)] = \mathbb{E}[-Z \mid -Z \ge 1]$}
+
+\centerline{$= \frac{1}{0.02+0.01+0.02+0.01} \times [1 \times 0.02 + 4 \times 0.01 + 6 \times 0.02 + 12 \times 0.01]=5$}
+
+
+The expected loss conditional on the loss being strictly larger than the 95\%-VaR is:
+
+\centerline{$\mathbb{E}[-Z \mid -Z > VaR_{95\%}(Z)] = \mathbb{E}[-Z \mid -Z > 1]$}
+
+\centerline{$= \frac{1}{0.01+0.02+0.01} \times [4 \times 0.01 + 6 \times 0.02 + 12 \times 0.01]=7$}
+
+\subsubsection*{Question 2}
+
+Consider a wealth manager who is looking into a particular portfolio strategy. She found that the historical estimates of the mean and variance of the portfolio's monthly return are 0.7\% and 1.8\%, respectively. She also estimated the mean and variance of the market portfolio's monthly return to be 0.6\% and 1.2\%, respectively, and the correlation between the return rates of the portfolio and the market is 0.9. The monthly risk-free return rate is flat at 0.2\% in the past.
+
+\textbf{(a)} According to CAPM, is this strategy a good one? Why?
+
+\textbf{(b)} The director of the wealth manager believes that the Fama-French three-factor model instead of CAPM should be used to assess the portfolio strategy. To this end, the wealth manager estimated the loadings of the portfolio for SMB and HML, which turn out to be -0.3 and 0.7, respectively. She also estimated the expected payoffs for the zero-cost strategies associated with SMB and HML to be 0.4\% and 0.3\%, respectively. Is this strategy a good one under the Fama-French three-factor model? Why?
+
+\subsubsection*{\textcolor{red}{Solution 2}}
+
+\textbf{(a)} We compute $\beta_{i}$ first:
+
+\centerline{$\beta_{i} = \frac{cov(r_{i}, r_{M})}{Var(r_{M})} = \frac{\rho\sigma_{i}\sigma_{M}}{\sigma_{M}^{2}} = \frac{0.9 \times \sqrt{1.8\%} \times \sqrt{1.2\%}}{1.2\%} = 1.10227$}
+
+As a result, the risk premium of the portfolio strategy implied by CAPM is:
+
+\centerline{$\overline{r}_{i} - r_{f} = \beta(\overline{r}_{M} - r_{f}) = 1.10227 \times (0.6\% - 0.2\%) = 0.44091\%$}
+
+This is lower than the estimated risk premium, namely $0.7\% - 0.2\% = 0.5\%$. So under CAPM, this portfolio strategy is good (it offers a positive alpha).
+
+\textbf{(b)} The loadings of the strategy on the market risk factor, SMB, and HML, are 1.10227, -0.3, and 0.7, respectively. The risk premiums of these three factors are 0.6\%-0.2\%, 0.4\%, and 0.3\%, respectively. Thus, the model risk premium of the strategy under the Fama-French three-factor model is:
+
+\centerline{$1.10227 \times (0.6\% - 0.2\%) - 0.3 \times 0.4\% + 0.7 \times 0.3\% = 0.531\%$}
+
+This is higher than the estimated risk premium of 0.5\%. Thus, this strategy is a bad one when benchmarked to the Fama-French three-factor model.
+
+\subsubsection*{Question 3}
+
+Suppose that David's total wealth is \$40,000, in which his car is worth \$15,000. Suppose his utility function is $u(x)=2\sqrt{x}$. There is a 5\% probability that his car would be stolen and he will lose \$15,000. There is also a 10\% probability that his car would be damaged in an accident and he will have to spend \$10,000 to repair it.
+
+\textbf{(a)} What is the Arrow-Pratt absolute risk aversion coefficient of David?
+
+\textbf{(b)} If he wants to buy a car insurance which can fully cover his loss in both cases, i.e., stolen and damaged, what is the maximum amount of money he is willing to pay for the insurance?
+
+\subsubsection*{\textcolor{red}{Solution 3}}
+
+\textbf{(a)} The Arrow-Pratt absolute risk aversion coefficient is:
+
+\centerline{$r(x) = -\frac{u''(x)}{u'(x)} = -\frac{2 \times (1/2) \times (-1/2)x^{-3/2}}{2 \times (1/2)x^{-1/2}} = \frac{1}{2}x^{-1}$}
+
+\textbf{(b)} The maximum amount of money, $A$, David is willing to pay is the amount such that David is indifferent between his wealth if he purchases the insurance contract and his wealth if he does not purchase the contract.
+
+If David purchases the insurance contract, his wealth is $40000-A$ and the utility of the wealth is $2\sqrt{40000-A}$.
+
+If David does not purchase the insurance contract, the expected utility of his wealth is:
+
+\centerline{$2\sqrt{40000-15000} \times 0.05 + 2\sqrt{40000-10000} \times 0.10 + 2\sqrt{40000} \times 0.85 = 390.4524$}
+
+Setting the expected utility of the wealth in the case in which David purchases the insurance equal to the case in which he does not purchase the insurance, namely:
+
+\centerline{$2\sqrt{40000-A} = 390.4524$}
+
+We derive $A = 1886.731$.
+
+\subsubsection*{Question 4}
+
+Consider the following Limit Order Book (LOB) for a security:
+
+\textbf{Bid Side (Depth Available at Price):}
+\$1.99 (Depth: 2), \$1.98 (Depth: 3), \$1.97 (Depth: 1), \$1.96 (Depth: 2), \$1.95 (Depth: 4).
+
+\textbf{Ask Side (Depth Available at Price):}
+\$2.02 (Depth: 1), \$2.03 (Depth: 2), \$2.04 (Depth: 2), \$2.05 (Depth: 3), \$2.06 (Depth: 4).
+
+Current Bid Price: \$1.99. Current Ask Price: \$2.02. Current Mid Price: \$2.005.
+
+\textbf{(a)} Suppose an order arrives to buy 3 units of the security at price \$2.00. Calculate the mid price immediately after the arrival of the order.
+
+\textbf{(b)} Suppose an order arrives to sell 1 unit of the security at price \$2.02. Calculate the mid price immediately after the arrival of the order.
+
+\textbf{(c)} Suppose an order arrives to buy 3 units of the security at the market price. Calculate the mid price immediately after the arrival of the order.
+
+\textbf{(d)} Suppose cancelation of an existing sell orders of size 1 at price \$2.02 arrives. Calculate the mid price immediately after the arrival of cancelation.
+
+\subsubsection*{\textcolor{red}{Solution 4}}
+
+\textbf{(a)} The order is a buy limit order at \$2.00. Since \$2.00 < Ask (\$2.02), it becomes the new best bid.
+New Bid: \$2.00. Ask remains: \$2.02.
+Mid Price:
+
+\centerline{$\frac{2.02 + 2.00}{2} = \$2.01$}
+
+\textbf{(b)} The order is a sell limit order at \$2.02. Since \$2.02 > Bid (\$1.99) and \$2.02 is the current Ask, it adds depth to the ask side but does not change the best prices.
+Bid: \$1.99. Ask: \$2.02.
+Mid Price remains:
+
+\centerline{$\frac{2.02 + 1.99}{2} = \$2.005$}
+
+\textbf{(c)} A market buy order for 3 units will walk up the book.
+It consumes the 1 unit at \$2.02.
+It consumes 2 units at \$2.03.
+The new best Ask becomes \$2.04. Bid remains \$1.99.
+Mid Price:
+
+\centerline{$\frac{2.04 + 1.99}{2} = \$2.015$}
+
+\textbf{(d)} Cancelation of 1 unit at \$2.02.
+The existing depth at \$2.02 was 1. After cancelation, depth at \$2.02 becomes 0.
+The next available ask is \$2.03.
+New Ask: \$2.03. Bid remains \$1.99.
+Mid Price:
+
+\centerline{$\frac{2.03 + 1.99}{2} = \$2.01$}
+
+\subsubsection*{Question 5}
+
+Consider a 3-period mean-variance portfolio selection problem with one risk-free asset and 1 risky stock. Suppose the initial wealth is \$1. Suppose that the risk-free net return in each period is $r_{f,k}=0.03$. In addition, for $k=1,...,3$ the expected excess return vector of the stocks is:
+
+\centerline{$\mu_{k} = \mathbb{E}[R_{k}] = 5\%$}
+
+and variance of the stock excess return rate is:
+
+\centerline{$C_{k} = Var(R_{k}) = 0.09$}
+
+Suppose the agent's target is to grow the wealth by 6\% in each period. Find the optimal portfolio strategy of the agent.
+
+\subsubsection*{\textcolor{red}{Solution 5}}
+
+The number of investment periods is $N=3$. We first compute $D_k$:
+
+\centerline{$D_{k} = \mathbb{E}[R_{k}R_{k}^{\top}] = C_{k} + \mu_{k}\mu_{k}^{\top} = (5\%)^{2} + 0.09 = 0.0925$}
+
+\centerline{$\mu_{k}^{\top}D_{k}^{-1}\mu_{k} = (5\%)^{2} / 0.0925 = 0.027027028, \quad k=1, ..., 3$}
+
+Next, we compute:
+
+\centerline{$D_{k}^{-1}\mu_{k} = 5\% / 0.0925 = 0.54054054$}
+
+\centerline{$s_{k} = \prod_{j=k}^{N-1}(1+r_{f,j+1}) = 1.03^{3-k}, \quad k=0, ..., 2$}
+
+\centerline{$\beta_{k} = \prod_{j=k}^{N-1}(1-\mu_{j+1}^{\top}D_{j+1}^{-1}\mu_{j+1}) = 0.972972973^{3-k}, \quad k=0, ..., 2$}
+
+The target expected final wealth is $z_0 = 1 \times (1+0.06)^3$. (The problem says "grow the wealth by 6\% in each period", implying $z_0 = (1.06)^3$).
+
+The optimal strategy formula is $\pi_{k}^{*} = -A_{k}x_{k} + B_{k}$.
+
+We calculate the coefficients:
+
+\centerline{$A_{k} := (1+r_{f,k+1})D_{k+1}^{-1}\mu_{k+1} = 1.03 \times 0.54054054 = 0.556756757, \quad k=0, 1, 2$}
+
+\centerline{$B_{k} := A_{k}s_{k}^{-1}\frac{z_{0}-\beta_{0}s_{0}x_{0}}{1-\beta_{0}}$}
+
+Substituting the values ($x_0=1$, $z_0=(1.06)^3$, $s_0=1.03^3$, $\beta_0=0.97297^3$):
+
+\centerline{$B_{k} = 0.556756757 \times \frac{(1.06)^{3} - 0.972972973^{3} \times 1.03^{3} \times 1}{1 - 0.972972973^{3}} \times 1.03^{k-3}$}
+
+\centerline{$= 1.30187509 \times 1.03^{k-3}$}
+
+Thus, the values for $B_k$ are:
+
+\centerline{$B_k \approx \begin{cases} 1.91400139, & k=0, \\ 1.227142143, & k=1, \\ 1.263956407, & k=2. \end{cases}$}
+
+The optimal portfolio strategy is:
+
+\centerline{$\pi_{k}^{*} = -0.556756757 x_{k} + B_{k}, \quad k=0, 1, 2$}
