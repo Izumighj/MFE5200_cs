@@ -1,0 +1,167 @@
+\section{Principles of Monte Carlo}
+
+\subsection{Introduction}
+
+\subsubsection*{Monte Carlo integration}
+
+Consider estimating $\alpha=\int_0^1 f(x)\,dx$. If $U\sim\operatorname{Unif}(0,1)$, then $\alpha=\mathbb{E}[f(U)]$. Given independent samples $U_1,\ldots,U_n\sim\operatorname{Unif}(0,1)$, the Monte Carlo estimator is
+
+$\hat{\alpha}_n=\frac{1}{n}\sum_{i=1}^n f(U_i)$.
+
+By the strong law of large numbers, $\hat{\alpha}_n\to\alpha$ a.s. as $n\to\infty$. By the central limit theorem,
+
+$\hat{\alpha}_n-\alpha\approx N(0,\sigma_f^2/n)$,
+
+where $\sigma_f^2=\operatorname{var}(f(U))$. Thus the standard error is $\sigma_f/\sqrt{n}$. Halving the standard error requires increasing the number of samples by a factor of $4$.
+
+\subsubsection*{Dimensionality}
+
+For one-dimensional integration, Monte Carlo is usually not competitive with deterministic methods such as the trapezoidal rule, whose error is $O(n^{-2})$. The advantage of Monte Carlo is that its convergence rate is not directly sensitive to the dimension of the problem, while many deterministic integration methods suffer from the curse of dimensionality.
+
+\subsection{First Example: European Call Option}
+
+\subsubsection*{Risk-neutral valuation}
+
+Let $S(t)$ be the stock price at time $t$. A European call option with strike $K$ and maturity $T$ has payoff $(S(T)-K)^+=\max\{0,S(T)-K\}$. Under the risk-neutral measure $\mathbb{Q}$, the time-$0$ price is
+
+$V_0=\mathbb{E}_0^{\mathbb{Q}}\left[e^{-rT}(S(T)-K)^+\right]$,
+
+where $r$ is the continuously compounded risk-free rate.
+
+\subsubsection*{Stock-price dynamics}
+
+Under $\mathbb{Q}$, geometric Brownian motion satisfies $\frac{dS(t)}{S(t)}=r\,dt+\sigma\,dW(t)$, where $W(t)$ is a standard Brownian motion. The exact solution at time $T$ is
+
+$S(T)=S(0)\exp\left((r-\frac{1}{2}\sigma^2)T+\sigma W(T)\right)$.
+
+Since $W(T)=\sqrt{T}Z$ with $Z\sim N(0,1)$,
+
+$S(T)=S(0)\exp\left((r-\frac{1}{2}\sigma^2)T+\sigma\sqrt{T}Z\right)$.
+
+\subsubsection*{Simulation algorithm}
+
+For $i=1,\ldots,n$: generate $Z_i\sim N(0,1)$, then set
+
+$S_i(T)=S(0)\exp\left((r-\frac{1}{2}\sigma^2)T+\sigma\sqrt{T}Z_i\right)$,
+
+$C_i=e^{-rT}(S_i(T)-K)^+$.
+
+The Monte Carlo estimator is $\hat{C}_n=\frac{1}{n}\sum_{i=1}^n C_i$. It is unbiased, $\mathbb{E}[\hat{C}_n]=C$, and strongly consistent, $\hat{C}_n\to C$ with probability $1$.
+
+\subsubsection*{Confidence interval}
+
+The sample standard deviation of the simulated discounted payoffs is
+
+$s_C=\sqrt{\frac{1}{n-1}\sum_{i=1}^n(C_i-\hat{C}_n)^2}$.
+
+An asymptotic $1-\delta$ confidence interval is
+
+$\hat{C}_n\pm z_{\delta/2}\frac{s_C}{\sqrt{n}}$.
+
+Since $s_C$ is estimated, one may replace the normal quantile with the corresponding $t$-quantile with $n-1$ degrees of freedom.
+
+\subsubsection*{Black-Scholes benchmark}
+
+The Black-Scholes value of a European call is
+
+$BS(S,\sigma,T,r,K)=S\Phi(d_1)-e^{-rT}K\Phi(d_2)$,
+
+where
+
+$d_1=\frac{\log(S/K)+(r+\frac{1}{2}\sigma^2)T}{\sigma\sqrt{T}}$,
+
+$d_2=\frac{\log(S/K)+(r-\frac{1}{2}\sigma^2)T}{\sigma\sqrt{T}}$.
+
+\subsection{Simulation Layers}
+
+\subsubsection*{Layered construction}
+
+Monte Carlo derivative pricing is built in layers:
+
+$U_i\to Z_i\to S_i(T)\ \text{or}\ \{S_i(t_j)\}_{j=1}^m\to C_i\to \hat{C}_n,\ s_C$.
+
+The lower layers transform simple random variables into asset prices or paths. The upper layers transform paths into discounted payoffs and then into statistical summaries.
+
+\subsection{Second Example: Asian Option}
+
+\subsubsection*{Path dependence}
+
+An Asian option is path dependent. A discrete-average Asian call has payoff $(\bar{S}-K)^+$, where
+
+$\bar{S}=\frac{1}{m}\sum_{j=1}^m S(t_j)$,
+
+and $0=t_0<t_1<\cdots<t_m=T$. Its time-$0$ value is
+
+$\mathbb{E}_0^{\mathbb{Q}}\left[e^{-rT}(\bar{S}-K)^+\right]$.
+
+To estimate this value, simulate the path values $S(t_1),\ldots,S(t_m)$, compute the average $\bar{S}$, discount the payoff, and average over independent replications.
+
+\subsection{Efficiency of Simulation Estimators}
+
+\subsubsection*{Central limit theorem}
+
+Suppose $\hat{C}_n=\frac{1}{n}\sum_{i=1}^n C_i$, where $C_i$ are i.i.d., $\mathbb{E}_0^{\mathbb{Q}}[C_i]=C$, and $\operatorname{var}(C_i)=\sigma_C^2<\infty$. Then
+
+$\frac{\hat{C}_n-C}{\sigma_C/\sqrt{n}}\Rightarrow N(0,1)$,
+
+or equivalently
+
+$\sqrt{n}(\hat{C}_n-C)\Rightarrow N(0,\sigma_C^2)$.
+
+Hence $\hat{C}_n-C\approx N(0,\sigma_C^2/n)$. For two unbiased estimators of the same quantity, the estimator with lower variance is preferred, other things being equal.
+
+\subsection{Bias}
+
+\subsubsection*{General principle}
+
+Variance reduction and faster computation are useful only if the estimator converges to the correct value. Some estimators are biased for every finite $n$, but become asymptotically unbiased as computational effort increases.
+
+\subsubsection*{Ratio estimator}
+
+For i.i.d. samples $(X_i,Y_i)$, the estimator $\bar{X}/\bar{Y}$ for $\mathbb{E}[X]/\mathbb{E}[Y]$ is generally biased because
+
+$\mathbb{E}\left[\frac{\bar{X}}{\bar{Y}}\right]\ne\frac{\mathbb{E}[X]}{\mathbb{E}[Y]}$.
+
+However,
+
+$\frac{\bar{X}}{\bar{Y}}\to\frac{\mathbb{E}[X]}{\mathbb{E}[Y]}$
+
+with probability $1$, and the normalized error is asymptotically normal. The bias becomes negligible as $n\to\infty$.
+
+\subsubsection*{Model discretization error}
+
+If the exact geometric Brownian motion transition is replaced by the Euler recursion
+
+$S((j+1)h)=S(jh)+rS(jh)h+\sigma S(jh)\sqrt{h}Z_{j+1}$,
+
+then the simulated path distribution is not exactly the same as that implied by the continuous-time model. Option values estimated from this approximate dynamics are biased.
+
+This model discretization bias can be reduced or eliminated by: $\mathrm{(i)}$ using the exact transition when available; $\mathrm{(ii)}$ decreasing the time step $h$, at the cost of more transitions per path.
+
+\subsubsection*{Payoff discretization error}
+
+For a continuously averaged Asian option,
+
+$\bar{S}=\frac{1}{T}\int_0^T S(u)\,du$.
+
+Even exact simulation at a finite set of dates cannot compute the continuous average exactly. The payoff must be approximated, which creates payoff discretization error. This bias can be made small by using a smaller simulation time step, but computational cost increases.
+
+Model discretization error comes from approximating the underlying dynamics. Payoff discretization error comes from approximating the payoff functional.
+
+\subsection{Mean Square Error}
+
+\subsubsection*{Bias-variance decomposition}
+
+For an estimator $\hat{\alpha}$ of $\alpha$, the mean square error is
+
+$\operatorname{MSE}(\hat{\alpha})=\mathbb{E}\left[(\hat{\alpha}-\alpha)^2\right]$.
+
+It decomposes as
+
+$\operatorname{MSE}(\hat{\alpha})=\left(\mathbb{E}[\hat{\alpha}]-\alpha\right)^2+\mathbb{E}\left[\left(\hat{\alpha}-\mathbb{E}[\hat{\alpha}]\right)^2\right]$,
+
+or
+
+$\operatorname{MSE}(\hat{\alpha})=\operatorname{Bias}^2(\hat{\alpha})+\operatorname{Variance}(\hat{\alpha})$.
+
+Thus MSE balances bias and variance.
