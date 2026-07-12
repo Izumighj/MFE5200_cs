@@ -1,71 +1,137 @@
-\section{Limit Order Book}
+\section{Markov Chain Monte Carlo Methods}
 
-\subsection{Bid, Ask, and Mid Prices}
+\subsection{Bayesian Inference}
 
-The lowest price among all sell limit orders is referred to as ask price.
+\subsubsection*{Prior, likelihood, and posterior}
 
-The highest price among all buy limit orders is referred to as bid price.
+For data $x=(x_1,\ldots,x_n)$, parameters $\theta=(\theta_1,\ldots,\theta_r)$, likelihood $L(\theta)=f(x\mid\theta)$, and prior $p(\theta)$, Bayes' theorem gives
 
-The difference between the bid and ask prices is referred to as bid-ask spread. The average of the bid and ask prices is mid price.
+$\pi(\theta\mid x)=\dfrac{f(x\mid\theta)p(\theta)}{f(x)}\propto L(\theta)p(\theta),\qquad f(x)=\int f(x\mid\theta)p(\theta)d\theta$.
 
-\subsection{Resolution Parameters}
+A common estimator is the posterior mean $\hat\theta=\int\theta\pi(\theta\mid x)d\theta$. A posterior can serve as the prior when new data arrive.
 
-In general, an order $x=(p_{x},\omega_{x},t_{x})$ submitted at time $t_{x}$ with price $p_{x}$ and size $\omega_{x}>0$ (respectively, $\omega_{x}<0)$ is a commitment to sell (respectively, buy) up to $|\omega_{x}|$ units of the traded at a price no less than (respectively, no greater than) $p_{x}$.
+\subsubsection*{Normal-normal conjugacy}
 
-The lot size $\sigma$ of an LOB is the smallest amount of the asset that can be traded within it. All orders must arrive with a size $\omega_{x}\in\{\pm k\sigma:k=1,2,...\}$.
+If $x_i\stackrel{iid}{\sim}N(\mu,\sigma^2)$ with known $\sigma^2$ and $\mu\sim N(m,\tau^2)$, then $\mu\mid x\sim N(m_1,\tau_1^2)$, where
 
-The tick size $\pi$ of an LOB is the smallest permissible price interval between different orders within it. All orders must arrive with a price that is specified to the accuracy of $\pi$.
+$m_1=\dfrac{\tau^2\bar x+m\sigma^2/n}{\tau^2+\sigma^2/n},\qquad \tau_1^2=\dfrac{\tau^2\sigma^2}{n\tau^2+\sigma^2}$.
 
-The lot size $\sigma$ and tick size $\pi$ of an LOB are collectively called its resolution parameters.
+As $n\to\infty$, $m_1\to\bar x$ and $\tau_1^2\to0$. As $\tau^2\to\infty$, the prior becomes noninformative and $\mu\mid x\sim N(\bar x,\sigma^2/n)$.
 
-\subsection{Limit Order Book}
+A conjugate prior produces a posterior in the same family, with updated hyperparameters. Common pairs are Poisson--Gamma, Binomial--Beta, normal mean--Normal, and normal variance--Inverse Gamma. The lecture uses
 
-An LOB $\mathcal{L}(t)$ is the set of all active orders in a market at time $t$. The active orders in an LOB $\mathcal{L}(t)$ can be partitioned into the set of active buy orders $\mathcal{B}(t)$, for which $\omega_{x}<0$, and the set of active sell orders $\mathcal{A}(t)$, for which $\omega_{x}>0$.
+$f_G(x)=\dfrac{\beta^\alpha x^{\alpha-1}e^{-\beta x}}{\Gamma(\alpha)},\quad f_{IG}(x)=\dfrac{\beta^\alpha x^{-\alpha-1}e^{-\beta/x}}{\Gamma(\alpha)}$.
 
-\subsection{Depth}
+\subsubsection*{Importance sampling for posteriors}
 
-The bid-side depth available at price $p$ and at time $t$ is
+For an easy density $q$, draw $\theta_i\sim q$ and estimate
 
-\centerline{$n^{b}(p,t):=\sum_{\{x\in\mathcal{B}(t):p_{x}=p\}}\omega_{x}$}
+$\hat\theta=\int\theta\dfrac{\pi(\theta\mid x)}{q(\theta)}q(\theta)d\theta\approx\dfrac1n\sum_{i=1}^n\dfrac{\theta_i\pi(\theta_i\mid x)}{q(\theta_i)}$.
 
-The ask-side depth available at price $p$ and at time $t$, denoted $n^{a}(p,t)$, is defined similarly using $\mathcal{A}(t)$.
+Here IS facilitates integration rather than primarily reducing variance; poor overlap between $q$ and the posterior may cause large variance.
 
-The bid price at time $t$ is the highest stated price among all active buy orders at time $t$, i.e.,
+\subsection{Gibbs Sampling}
 
-\centerline{$b(t):=\max_{x\in\mathcal{B}(x)}p_{x}$}
+\subsubsection*{General algorithm}
 
-The ask price at time $t$ is the lowest stated price among all active sell orders at time $t$, i.e.,
+MCMC constructs a Markov chain whose limiting distribution is the target posterior. Gibbs sampling cycles through full conditionals:
 
-\centerline{$a(t):=\min_{x\in\mathcal{A}(x)}p_{x}$}
+$\theta_j^{(i)}\sim p(\theta_j\mid\theta_1^{(i)},\ldots,\theta_{j-1}^{(i)},\theta_{j+1}^{(i-1)},\ldots,\theta_r^{(i-1)},x)$.
 
-\subsection{Relative Price}
+Under standard regularity conditions, $\theta^{(i)}$ converges in distribution to $p(\theta\mid x)$. Discard $M$ burn-in draws and estimate
 
-The bid-ask spread at time $t$ is $s(t):=a(t)-b(t)$. The mid price at time $t$ is $m(t):=[a(t)+b(t)]/2$.
+$\hat\theta_j=\dfrac1n\sum_{i=1}^n\theta_j^{(M+i)}$.
 
-For a given price $p$, the bid-relative price is $\delta^{b}(p):=b(t)-p$ and the ask-relative price is $\delta^{a}(p):=p-a(t)$.
+\subsubsection*{Bivariate normal}
 
-For a given order $x=(p_{x},\omega_{x},t_{x})$, the relative price of the order is $\delta_{x}:=\delta^{b}(p_{x})$ if the order is a buy order, and $\delta_{x}:=\delta^{a}(p_{x})$ if the order is a sell order.
+For $(\theta_1,\theta_2)^\top\sim N(0,\Sigma)$ with unit variances and correlation $\rho$,
 
-The bid-side depth available at relative price $\delta$ and at time $t$ is
+$\theta_1\mid\theta_2\sim N(\rho\theta_2,1-\rho^2),\qquad \theta_2\mid\theta_1\sim N(\rho\theta_1,1-\rho^2)$.
 
-\centerline{$N^{b}(\delta,t)=\sum_{\{x\in\mathcal{B}(t):\delta^{x}=\delta\}}\omega_{x}$}
+Thus, using independent $Z_1,Z_2\sim N(0,1)$,
 
-The ask-side is defined similarly.
+$\theta_1^{(i)}=\rho\theta_2^{(i-1)}+\sqrt{1-\rho^2}Z_1,\qquad \theta_2^{(i)}=\rho\theta_1^{(i)}+\sqrt{1-\rho^2}Z_2$.
 
-\subsection{Price changes in LOBs}
+\subsubsection*{Unknown normal mean and variance}
 
-Consider a buy (respectively, sell) order $x=(p_{x},\omega_{x},t_{x})$ that arrives immediately after time $t$. If $p_{x}\le b(t)$ (respectively, $p_{x}\ge a(t)$), then $x$ is a limit order that becomes active upon arrival. It does not cause $b(t)$ or $a(t)$ to change.
+For $x_j\sim N(\mu,\sigma^2)$ with both unknown,
 
-If $b(t)<p_{x}<a(t)$, then $x$ is a limit order that becomes active upon arrival. Upon arrival, $b(t_{x})=p_{x}$ (respectively, $a(t_{x})=p_{x})$.
+$\mu_i\mid\sigma_{i-1}^2\sim N(m_i,\tau_i^2),\quad m_i=\dfrac{\tau_{i-1}^2\bar x+m_{i-1}\sigma_{i-1}^2/n}{\tau_{i-1}^2+\sigma_{i-1}^2/n},\quad \tau_i^2=\dfrac{\tau_{i-1}^2\sigma_{i-1}^2}{n\tau_{i-1}^2+\sigma_{i-1}^2}$.
 
-If $p_{x}\ge a(t)$ (respectively, $p_{x}\le b(t)$), then $x$ is a market order that immediately matches to one or more active sell (respectively, buy) orders upon arrival. Whenever such a matching occurs, it does so at the price of the active order, which is not necessarily equal to the price of the incoming order. Whether or not such a matching causes $a(t)$ (respectively, $b(t))$ to change at time $t_{x}$ depends on $n^{a}(a(t),t)$ (respectively, $n^{b}(b(t),t))$ and $\omega_{x}$.
+$\sigma_i^2\mid\mu_i\sim IG(\alpha_i,\beta_i),\qquad \alpha_i=\alpha_{i-1}+n/2,\qquad \beta_i=\beta_{i-1}+\dfrac12\sum_{j=1}^n(x_j-\mu_i)^2$.
 
-In particular, the new bid price $b(t_{x})$ upon arrival of a sell market order $x$ is
+Alternate these draws, discard burn-in, and average the retained values.
 
-\centerline{$b(t_{x}) = \max(p_{x},q)$, where $q=\text{argmax}_{k^{\prime}}^{k=b(t)}|n^{b}(k,t)|>|\omega_{x}|$}
+\subsection{Jump-Diffusion Case Study}
 
-Similarly, the new ask price $a(t_{x})$ upon arrival of a buy market order $x$ is
+\subsubsection*{Model and latent jumps}
 
-\centerline{$a(t_{x}) = \min(p_{x},q)$, where $q=\text{argmin}_{k^{\prime}}\sum_{k=a(t)}^{k^{\prime}}|n^{a}(k,t)|>|\omega_{x}|$}
+Merton's model is $d\log S_t=\mu dt+\sigma dW_t+YdN_t$, where $N_t$ has intensity $\lambda$ and $Y\sim N(k,s^2)$. For small $\Delta t$,
 
-Put another way, the incoming order $x$ matches to the highest priority active order $y$ of opposite type.
+$x_i=\Delta\log S_i=\mu\Delta t+\sigma\Delta W_i+Y_i\Delta N_i,\qquad P(\Delta N_i=1)=\lambda\Delta t$.
+
+Conditional return laws are
+
+$x_i\mid\Delta N_i=0\sim N(\mu\Delta t,\sigma^2\Delta t),\qquad x_i\mid\Delta N_i=1\sim N(\mu\Delta t+k,\sigma^2\Delta t+s^2)$.
+
+If $f_0,f_1$ denote these densities, the latent indicator probability is
+
+$P(\Delta N_i=1\mid x_i)=\dfrac{f_1(x_i)\lambda\Delta t}{f_1(x_i)\lambda\Delta t+f_0(x_i)(1-\lambda\Delta t)}$.
+
+When $\Delta N_i=1$, the latent jump size satisfies
+
+$Y_i\mid x_i\sim N\left(\dfrac{(x_i-\mu\Delta t)/(\sigma^2\Delta t)+k/s^2}{1/(\sigma^2\Delta t)+1/s^2},\dfrac1{1/(\sigma^2\Delta t)+1/s^2}\right)$.
+
+\subsubsection*{Conditional parameter updates}
+
+Given the latent $\Delta N_i,Y_i$, use normal updates for $\mu,k$, inverse-gamma updates for $\sigma^2,s^2$, and a beta update for the jump probability. In particular,
+
+$\sigma^2\mid\cdots\sim IG\left(\alpha+\dfrac n2,\beta+\dfrac{\sum_i(x_i-\mu\Delta t-Y_i\Delta N_i)^2}{2\Delta t}\right)$,
+
+$\lambda\Delta t\mid\cdots\sim Be(a+N,b+n-N),\qquad N=\sum_i\Delta N_i$,
+
+$k\mid\cdots\sim N\left(\dfrac{\tau_Y^2\bar Y+m_Ys^2/N}{\tau_Y^2+s^2/N},\dfrac{\tau_Y^2s^2}{N\tau_Y^2+s^2}\right)$,
+
+$s^2\mid\cdots\sim IG\left(\alpha_Y+\dfrac N2,\beta_Y+\dfrac12\sum_{j=1}^N(Y_j-k)^2\right)$.
+
+One Gibbs sweep updates $\mu,\sigma^2,\lambda,k,s^2$, every $\Delta N_i$, and then $Y_i$ where $\Delta N_i=1$. The Dow Jones example finds about $1.75$--$5.5$ jumps per year and large jump variances, so jump risk is material.
+
+\subsection{Metropolis--Hastings}
+
+\subsubsection*{Detailed balance}
+
+For transition probabilities $p_{ij}$, stationarity requires $\pi(j)=\sum_i\pi(i)p_{ij}$. Detailed balance,
+
+$\pi(i)p_{ij}=\pi(j)p_{ji}$,
+
+is sufficient. Starting with proposal $q_{ij}$, accept $i\to j$ with
+
+$\alpha_{ij}=\min\left\{1,\dfrac{\pi(j)q_{ji}}{\pi(i)q_{ij}}\right\}$.
+
+Then $p_{ij}=q_{ij}\alpha_{ij}$ for $i\ne j$, with leftover probability assigned to staying at $i$; the resulting chain is reversible with stationary distribution $\pi$.
+
+\subsubsection*{Continuous-state algorithm}
+
+At state $\theta_{k-1}$, propose $X_k\sim q(\cdot\mid\theta_{k-1})$ and compute
+
+$\alpha=\min\left\{1,\dfrac{\pi(X_k)q(\theta_{k-1}\mid X_k)}{\pi(\theta_{k-1})q(X_k\mid\theta_{k-1})}\right\}$.
+
+Accept if $U\le\alpha$; otherwise set $\theta_k=\theta_{k-1}$. Symmetric proposals cancel the $q$ ratio, and unknown target normalizing constants cancel. Gibbs sampling is MH with full-conditional proposals and acceptance probability $1$.
+
+\subsection{Stochastic Volatility And MH}
+
+Let $y_t=e^{h_t/2}\epsilon_t$ and $h_{t+1}=\mu+\tau\eta_t$, with independent standard normal shocks. For priors $\mu\sim N(\alpha_\mu,\beta_\mu^2)$ and $\tau^2\sim IG(\alpha_\tau,\beta_\tau)$,
+
+$\mu\mid\tau^2,h\sim N(\hat\alpha_\mu,\hat\beta_\mu^2),\quad \hat\alpha_\mu=\dfrac{\bar h\beta_\mu^2+\alpha_\mu\tau^2/n}{\beta_\mu^2+\tau^2/n},\quad \hat\beta_\mu^2=\dfrac{\beta_\mu^2\tau^2}{n\beta_\mu^2+\tau^2}$,
+
+$\tau^2\mid\mu,h\sim IG\left(\alpha_\tau+\dfrac n2,\beta_\tau+\dfrac12\sum_{t=1}^n(h_t-\mu)^2\right)$.
+
+The latent-state conditional is nonstandard:
+
+$p(h_t\mid\mu,\tau,y,h_{-t})\propto e^{-h_t/2}\exp\left(-\dfrac{y_t^2}{2e^{h_t}}\right)\exp\left(-\dfrac{(h_t-\mu)^2}{2\tau^2}\right)$.
+
+Use an independence proposal $x_t\sim q$, e.g. normal, and accept with
+
+$\min\left\{1,\dfrac{p(x_t\mid\mu,\tau,y,h_{-t})q(h_t^{(i-1)})}{p(h_t^{(i-1)}\mid\mu,\tau,y,h_{-t})q(x_t)}\right\}$.
+
+This is Metropolis-within-Gibbs: use Gibbs for tractable conditionals and MH for nonstandard latent-volatility conditionals.

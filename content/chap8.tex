@@ -1,275 +1,129 @@
-\section{Multi-Period Investment Models}
+\section{Efficient MC For Value-At-Risk}
 
-\subsection{Multi-Period Investment}
+\subsection{VaR And Delta-Gamma}
 
-There are $N$ periods of investment. Denote the beginning and end of $j$-th period as $t_{j-1}$ and $t_{j}$, $j=1,...,N$. There is a risk-free asset and $m$ risky stocks in the market. The net return rate of investing in the risk-free asset in the $j$-th period is a constant $r_{f,j}$. The excess return rate of investing in stock $i$ in period $j$ is $R_{i,j}$. Assume that $R_{j}:=(R_{1,j},...,R_{m,j})^{\top}$, $j=1,...,N$ are independent.
+\subsubsection*{Loss and VaR}
 
-Consider an agent with initial wealth $x_{0}$ at the beginning of first period. The agent's decision is the allocation of his money in each period.
+Let $S$ be market prices/rates, $\Delta t$ the risk horizon, $\Delta S$ the risk-factor move, and $V(S,t)$ the portfolio value. The horizon loss is
 
-\subsection{Wealth Dynamics}
+$L=-\Delta V=V(S,t)-V(S+\Delta S,t+\Delta t),\qquad F_L(x)=P(L<x)$.
 
-Denote as $X_{j}$ the wealth of the agent at time $t_{j}$, $j=0,1,...,N$. Suppose that except for the initial investment, the agent does not inject new money nor withdraw money from the investment account before the terminal time $T:=t_{N}$.
+For tail probability $p$, VaR $x_p$ satisfies
 
-At the beginning of each period $j$, the agent decides to invest $\pi_{i,j-1}$ dollars in stock $i$, $i=1,...,m$, and the remaining amount of money in the risk-free asset. Wealth dynamics:
+$1-F_L(x_p)=P(L>x_p)=p$.
 
-\centerline{$X_{j}=(1+r_{f,j})X_{j-1}+\sum_{i=1}^{m}\pi_{i,j-1}R_{i,j}, \quad j=1,...,N$}
+For 99\% VaR, $p=0.01$. VaR is not coherent because subadditivity can fail.
 
-\subsection{Expected Utility Maximization}
+\subsubsection*{RiskMetrics}
 
-Assume that the agent maximizes the expected utility of her terminal wealth,
+Assume $\Delta S\sim N(0,\Sigma_S)$ and linear portfolio response $\Delta V=\delta^\top\Delta S$. Then
 
-\centerline{$\max_{\pi_{j-1},j=1,...,N}\mathbb{E}[u(X_{N})]$}
+$L\sim N(0,\sigma_L^2),\qquad \sigma_L^2=\delta^\top\Sigma_S\delta$.
 
-where $u$ is the agent's utility function and $\pi_{j-1}=(\pi_{1,j-1},...,\pi_{m,j-1})^{\top}$, $j=1,...,N$ are the agent's portfolio strategy.
+Thus 99\% VaR is approximately $2.33\sigma_L$.
 
-\subsection{Dynamic Programming}
+\subsubsection*{Delta-gamma approximation}
 
-We apply dynamic programming to solve the problem.
-Principle of Optimality: Starting from any point on the optimal path, the remaining decisions must constitute an optimal policy with regard to the point.
+For nonlinear portfolios,
 
-Consider time $t_{k}$ when the agent's wealth then is $x$. Consider the following problem:
+$\Delta V\approx\frac{\partial V}{\partial t}\Delta t+\delta^\top\Delta S+\frac12\Delta S^\top\Gamma\Delta S$,
 
-\centerline{$\max_{\pi_{j-1},j=k+1,...,N}\mathbb{E}_{k}[u(X_{N})|X_{k}=x]$}
+$\delta_i=\frac{\partial V}{\partial S_i},\qquad \Gamma_{ij}=\frac{\partial^2V}{\partial S_i\partial S_j}$.
 
-Denote the above optimal value function as $v_{k}(x)$.
+Let $\Delta S=CZ$, $Z\sim N(0,I)$, $CC^\top=\Sigma_S$. Then
 
-Dynamic Programming (DP) Equation:
+$L\approx a-(C^\top\delta)^\top Z-\frac12Z^\top(C^\top\Gamma C)Z,\qquad a=-(\Delta t)\frac{\partial V}{\partial t}$.
 
-\centerline{$v_{k}(x)=\max_{\pi_{k}}\mathbb{E}_{k}[v_{k+1}(X_{k+1})|X_{k}=x], \quad k=0,1,...,N-1$}
+Choose $C$ to diagonalize the quadratic term. If $-\frac12\tilde C^\top\Gamma\tilde C=U\Lambda U^\top$, $C=\tilde C U$, $\Lambda=\operatorname{diag}(\lambda_1,\ldots,\lambda_m)$, and $b=-C^\top\delta$, then
 
-\centerline{$v_{N}(x)=u(x)$}
+$Q=a+b^\top Z+Z^\top\Lambda Z=a+\sum_{j=1}^m(b_jZ_j+\lambda_jZ_j^2)$.
 
-Instead of solving a dynamic portfolio selection problem, we solve a family of single-period portfolio selection problem. $(\pi_{0}^{*},...,\pi_{N-1}^{*})$ is optimal to the dynamic portfolio selection problem if and only if $\pi_{k}^{*}$ is optimal to the above single-period portfolio selection problem, $k=0,...,N-1$.
+Use $P(L>x)\approx P(Q>x)$.
 
-\subsection{Power Utility}
+\subsubsection*{Distribution of $Q$}
 
-In the following, we assume power utility function:
+The cumulant generating function $\psi(\theta)=\log\mathbb{E}[e^{\theta Q}]$ is
 
-\centerline{$u(x)=\frac{x^{1-\gamma}}{1-\gamma}, \quad x>0$}
+$\psi(\theta)=a\theta+\frac12\sum_{j=1}^m\left(\frac{\theta^2b_j^2}{1-2\theta\lambda_j}-\log(1-2\theta\lambda_j)\right)$,
 
-for some $0<\gamma\ne1$. Applying DP, we have:
+valid when $\max_j\theta\lambda_j<1/2$. The characteristic function is $\hat\phi(u)=e^{\psi(iu)}$. Transform inversion gives
 
-\centerline{$v_{N-1}(x)=\max_{\pi_{N-1}}\mathbb{E}_{N-1}[u(X_{N})|X_{N-1}=x] = b_{N-1}x^{1-\gamma}, \quad x>0$}
+$P(Q\le x)-P(Q\le x-y)=\frac1\pi\int_0^\infty\operatorname{Re}\left(\hat\phi(u)\left[\frac{e^{iuy}-1}{iu}\right]e^{-iux}\right)du$.
 
-where
+Choose $y$ large so $P(Q\le x-y)$ is negligible.
 
-\centerline{$b_{N-1}=\max_{w}\frac{\mathbb{E}[(1+r_{f}+w^{\top}R_{N})^{1-\gamma}]}{1-\gamma}$}
+\subsubsection*{Plain MC and quantile}
 
-Denote the optimizer in the right-hand side of the above as $w_{N-1}^{*}$.
+Ordinary MC generates market moves, revalues the portfolio, and estimates
 
-By induction, we conclude:
+$P(L>x)\approx\frac1n\sum_{i=1}^n\mathbf{1}_{\{L_i>x\}}$.
 
-\centerline{$v_{k-1}(x)=(\prod_{j=k-1}^{N-1}(b_{j}(1-\gamma)))\frac{x^{1-\gamma}}{1-\gamma}$}
+The bottleneck is portfolio revaluation. With empirical CDF
 
-where
+$\hat F_{L,n}(x)=\frac1n\sum_{i=1}^n\mathbf{1}_{\{L_i\le x\}}$,
 
-\centerline{$b_{k-1}=\max_{w}\frac{\mathbb{E}[(1+r_{f}+w^{\top}R_{k})^{1-\gamma}]}{1-\gamma}, \quad k=1,...,N$}
+estimate VaR by $\hat x_p=\hat F_{L,n}^{-1}(1-p)$.
 
-Denote the optimizer in the right-hand side of the above as $w_{k-1}^{*}$. Then, the optimal portfolio is:
+\subsection{Variance Reduction}
 
-\centerline{$\pi_{k-1}^{*}=w_{k-1}^{*}X_{k-1}, \quad k=1,...N$}
+\subsubsection*{Control variate}
 
-\subsubsection*{Myopic Portfolio}
+Evaluate both $L_i$ and $Q_i$ on each path. A control estimator for $P(L>x)$ is
 
-With the power utility function, the investor acts at each stage, based on the optimal policy, as if he were faced with a single-period investment, i.e., as if he were myopic. When the utility function is not a power function or when the stock returns are not independent over time, the above is not necessarily true.
+$1-\hat F_L^{CV}(x)=\frac1n\sum_{i=1}^n\mathbf{1}_{\{L_i>x\}}-\hat\beta\left(\frac1n\sum_{i=1}^n\mathbf{1}_{\{Q_i>y\}}-P(Q>y)\right)$.
 
-For power utility functions, it is implicitly assumed that the wealth must remain positive. Thus, the portfolio $\pi$ needs to be constrained, i.e., $\pi_{i,k}\ge0$, $i=1,...,n$, and $\sum_{i=1}^{n}\pi_{i,k}\le X_{k}$.
+$P(Q>y)$ is known by transform inversion, and $y$ need not equal $x$. The method can disappoint in the far tail: $L$ and $Q$ may be highly correlated, but their exceedance indicators may not be, and few exceedances make $\hat\beta$ noisy.
 
-\subsubsection*{Example: Expected Utility Maximization}
+\subsubsection*{Importance sampling}
 
-Suppose the risk-free net return rate in each period is 0.03, and there is one stock in the market only with i.i.d. excess return rates over time. Suppose that the log return rate of the stock, $\ln(1+r_{f}+R_{k})$ follows normal distribution with mean 0.07 and variance 0.04.
+Large $Q$ occurs when $b_jZ_j$ is large or when $\lambda_jZ_j^2$ is large with $\lambda_j>0$. Define the twisted measure
 
-Suppose that the investor is not allowed to short-sell the stock or to borrow, i.e., $0\le\pi_{k}\le X_{k}$. Suppose that the investor has a power utility function with $\gamma=10$.
+$\frac{dP_\theta}{dP}=e^{\theta Q-\psi(\theta)}$.
 
-To find the optimal portfolio, we need to solve:
+Then
 
-\centerline{$\max_{w\in[0,1]}f(w)$}
+$P(L>x)=\mathbb{E}_\theta\left[e^{-\theta Q+\psi(\theta)}\mathbf{1}_{\{L>x\}}\right]$.
 
-where
+Under $P_\theta$, $Z$ remains normal with diagonal covariance:
 
-\centerline{$f(w):=\frac{\mathbb{E}[(1+r_{f}+R_{k}w)^{1-\gamma}]}{1-\gamma}$}
+$Z\sim N(\mu(\theta),\Sigma(\theta)),\qquad \mu_j(\theta)=\frac{\theta b_j}{1-2\lambda_j\theta},\qquad \sigma_j^2(\theta)=\frac1{1-2\lambda_j\theta}$.
 
-Straightforward calculation yields:
+For $\theta>0$, the mean shifts in the sign of $b_j$ and variance increases when $\lambda_j>0$.
 
-\centerline{$f^{\prime}(w)=\mathbb{E}[(1+r_{f}+R_{k}w)^{-\gamma}R_{k}]$}
+\subsubsection*{IS algorithm}
 
-By binary search, one can find that $f^{\prime}(0.1489)=0$, which implies that the optimal portfolio $w^{*}=0.1489$, i.e., it is optimal to invest 14.89% of wealth in the stock in each period.
+Choose $\theta>0$ with finite $\psi(\theta)$. For each path, generate $Z\sim N(\mu(\theta),\Sigma(\theta))$, compute $Q$, set $\Delta S=CZ$, revalue the portfolio to get $L$, and record
 
-\subsection{Long-Run Mean Exponential Growth Rate}
+$e^{-\theta Q+\psi(\theta)}\mathbf{1}_{\{L>x\}}$.
 
-Suppose $t_{k}-t_{k-1}=\Delta$, $k=1,...,N$ in the above, e.g., $\Delta$ is one month, so the terminal time $t_{N}=N\Delta$. Assume that the stock excess returns $\vec{R}_{k}$, $k=1,2,...$ are i.i.d.
+Average over paths. A practical twisting parameter solves
 
-For each portfolio strategy $(\pmb{\pi}_{1},\pmb{\pi}_{2},...)$, consider the long-run mean exponential growth rate:
+$\psi'(\theta_x)=x$.
 
-\centerline{$\lim_{N\rightarrow+\infty}\mathbb{E}[\frac{\log(X_{N}/X_{0})}{N}]$}
+Since $\psi'(\theta)=\mathbb{E}_\theta[Q]$, this samples under a distribution with $\mathbb{E}_{\theta_x}[Q]=x$, moving the rare threshold near the center of the new distribution.
 
-The objective is to maximize the above long-run mean exponential growth rate.
+\subsubsection*{Stratified IS}
 
-\subsubsection*{Kelly's Portfolio}
+Stratify the IS estimator by $Q$. For strata $A_1,\ldots,A_K$,
 
-It turns out that the optimal strategy is as follows: at each time $k\Delta$ invest $w_{i}^{*}$ proportion of wealth at that time in stock $i$, $i=1,...,n$, where
+$\mathbb{E}_\theta[e^{-\theta Q+\psi(\theta)}\mathbf{1}_{\{L>x\}}]=\sum_{k=1}^KP_\theta(Q\in A_k)\mathbb{E}_\theta[e^{-\theta Q+\psi(\theta)}\mathbf{1}_{\{L>x\}}\mid Q\in A_k]$.
 
-\centerline{$w^{*}:=(w_{1}^{*},...,w_{n}^{*})^{\top}=\text{argmax}_{w}\mathbb{E}[\log(1+r_{f}+w^{\top}R_{k})]$}
+Under $P_\theta$,
 
-The above strategy is called Kelly strategy.
+$\psi_\theta(u)=\psi(\theta+u)-\psi(\theta),\qquad \hat\phi_\theta(u)=e^{\psi(\theta+iu)-\psi(\theta)}$.
 
-Kelly portfolio has many interesting properties:
-Asymptotically maximizes the rate of asset growth.
-Asymptotically maximizes the median of wealth.
-Is a myopic strategy.
+Use inversion to find $F_\theta(x)=P_\theta(Q\le x)$ and stratum endpoints $a_k$ with desired probabilities, $A_k=(a_{k-1},a_k)$.
 
-The Kelly strategy may lead to a large fraction of wealth in bets or in risky investment. For instance, for a stock with annual mean excess return rate 4\% and volatility 20\%, the Kelly strategy is to invest 100\% of wealth in the stock.
+Conditional sampling uses acceptance-rejection: generate $Z\sim N(\mu(\theta),\Sigma(\theta))$, compute $Q$, assign to the stratum containing $Q$, keep it if that stratum still needs samples, otherwise discard. This can be worthwhile because generating $Z$ is cheap relative to revaluation.
 
-\subsubsection*{Fractional Kelly}
+With samples $(Q_{kj},L_{kj})$ in stratum $k$, estimate
 
-MacLean et al. (1992) propose fractional Kelly to tradeoff growth and security. $\kappa$-fractional Kelly refers to a strategy of investing $\kappa$ fraction of one's wealth in the Kelly portfolio and holding the remaining as cash (or in the risk-free asset).
+$\sum_{k=1}^KP_\theta(Q\in A_k)\frac1{n_k}\sum_{j=1}^{n_k}e^{-\theta Q_{kj}+\psi(\theta)}\mathbf{1}_{\{L_{kj}>x\}}$.
 
-Fractional Kelly is a heuristic portfolio, rather than the consequence of optimality. MacLean et al. (1992) lay out two attractive properties of fractional Kelly:
-It is easily computable.
-There is an effective tradeoff between growth and security by varying $\kappa$.
+\subsection{Numerical Example Notes}
 
-\subsection{Multi-Period Mean-Variance Portfolio}
+The lecture tests short option portfolios on 10 or 100 GBM assets. Prices, deltas, and gammas use Black-Scholes; volatility is 30\%, $r=5\%$, and most cases use uncorrelated assets. Thresholds are set by
 
-Next, we consider multi-period mean-variance portfolio selection. The market setting is as before. Denote by $\mu_{k}$ and $C_{k}$ the mean and variance of $R_{k}$, respectively.
+$x=\mathbb{E}[Q]+x_{\mathrm{std}}\sqrt{\operatorname{var}(Q)}=a+\sum_{j=1}^m\lambda_j+x_{\mathrm{std}}\sqrt{\sum_{j=1}^m(b_j^2+2\lambda_j^2)}$.
 
-At time 0, given initial wealth $x_{0}$, the agent considers the following dynamic portfolio selection problem:
-
-\centerline{$\min_{\pi_{0},...,\pi_{N-1}}\frac{1}{2}Var(X_{N})$}
-
-\centerline{$\mathrm{s.t.}\quad \mathbb{E}[X_{N}]=z_{0}$}
-
-\centerline{$X_{j}=(1+r_{f,j})X_{j-1}+\pi_{j-1}^{\top}R_{j}, \quad j=1,...,N$}
-
-\centerline{$X_{0}=x_{0}$}
-
-where $z_{0}$ is the agent's target for expected terminal wealth.
-
-
-\subsubsection*{Expected Quadratic Utility}
-
-Assume that $C_{k}$ is positive definite, $k=1,...,N$. 
-
-Assume that $z_{0}>\prod_{j=1}^{N}(1+r_{f,j})$. 
-
-The mean-variance portfolio selection problem is equivalent to the following:
-
-\centerline{$\min_{\pi_{0},...,\pi_{N-1}}\frac{1}{2}\mathbb{E}[(X_{N}-z_{0})^{2}]$}
-
-\centerline{$\mathrm{s.t.}\quad \mathbb{E}[X_{N}]=z_{0}$}
-
-\centerline{$X_{j}=(1+r_{f,j})X_{j-1}+\pi_{j-1}^{\top}R_{j}, \quad j=1,...,N$}
-
-\centerline{$X_{0}=x_{0}$}
-
-\subsubsection*{Lagrange Dual Method}
-
-Apply the Lagrange multiplier $\lambda_{0}$ to the constraint for the expected terminal wealth target, and we obtain:
-
-\centerline{$\min_{\pi_{0},...,\pi_{N-1}} \frac{1}{2}\mathbb{E}[(X_{N}-z_{0})^{2}] - \lambda_{0}(\mathbb{E}[X_{N}]-z_{0})$}
-
-subject to
-
-\centerline{$X_{j}=(1+r_{f,j})X_{j-1}+\pi_{j-1}^{\top}R_{j}, \quad j=1,...,N$}
-
-\centerline{$X_{0}=x_{0}$}
-
-Then, we apply dynamic programming to solve the above problem: for each $k=0,1,...,N-1$ and each $x$, consider:
-
-\centerline{$\min_{\pi_{k},...,\pi_{N-1}} \frac{1}{2}\mathbb{E}_{k}[(X_{N}-z_{0})^{2}|X_{k}=x]-\lambda_{0}(\mathbb{E}_{k}[X_{N}|X_{k}=x]-z_{0})$}
-
-\centerline{$\mathrm{s.t.}\quad X_{j}=(1+r_{f,j})X_{j-1}+\pi_{j-1}^{\top}R_{j}, \quad j=k+1,...,N$}
-
-\centerline{$X_{k}=x$}
-
-Denote the optimal value of the above as $v_{k}(x)$.
-
-\subsubsection*{Dynamic Programming}
-
-DP principle:
-
-\centerline{$v_{k}(x)=\min_{\pi_{k}}\mathbb{E}_{k}[v_{k+1}((1+r_{f,k+1})X_{k}+\pi_{k}^{\top}R_{k+1})|X_{k}=x]$}
-
-\centerline{$=\min_{\pi_{k}}\mathbb{E}[v_{k+1}((1+r_{f,k+1})x+\pi_{k}^{\top}R_{k+1})], \quad k=0,1,...,N-1$}
-
-\centerline{$v_{N}(x)=\frac{1}{2}x^{2}-(z_{0}+\lambda_{0})x+\frac{1}{2}z_{0}^{2}+\lambda_{0}z_{0}$}
-
-Denote $D_{k}:=\mathbb{E}[R_{k}R_{k}^{\top}]=C_{k}+\mu_{k}\mu_{k}^{\top}$, $k=1,...,N$.
-
-\subsubsection*{Optimal Portfolio}
-
-Consequently, the optimal portfolio is:
-
-\centerline{$\pmb{\pi}_{k}^{*}(x)=(1+r_{f,k+1})[(\prod_{j=k}^{N-1}(1+r_{f,j+1}))^{-1}(z_{0}+\lambda_{0})-x]\vec{D}_{k+1}^{-1}\pmb{\mu}_{k+1}$}
-where the multiplier $\lambda_{0}$ is to be determined. By maximizing $v_{0}(x_{0})$ with respect to the multiplier $\lambda_{0}$, we can derive the multiplier:
-
-$\lambda_{0}=-z_{0}+\frac{1}{1-\prod_{j=0}^{N-1}(1-\pmb{\mu}_{j+1}^{\top}\vec{D}_{j+1}^{-1}\pmb{\mu}_{j+1})}$
-
-$\times [z_{0}-(\prod_{j=0}^{N-1}(1+r_{f,j+1}))(\prod_{j=0}^{N-1}(1-\pmb{\mu}_{j+1}^{\top}\vec{D}_{j+1}^{-1}\pmb{\mu}_{j+1}))x_{0}]$
-
-To summarize, the optimal portfolio is:
-
-\centerline{$\pmb{\pi}_{k}^{*}(x)=(1+r_{f,k+1})\left[s_{k}^{-1}(\frac{z_{0}-\beta_{0}s_{0}x_{0}}{1-\beta_{0}})-x\right]\vec{D}_{k+1}^{-1}\pmb{\mu}_{k+1}$}
-where $s_{k}$ stands for the risk-free growth rate from the beginning of $k$-th period to the end, i.e., $s_{k}:=\prod_{j=k}^{N-1}(1+r_{f,j+1})$, and $\beta_{k}:=\prod_{j=k}^{N-1}(1-\pmb{\mu}_{j+1}^{\top}\vec{D}_{j+1}^{-1}\pmb{\mu}_{j+1})$.
-
-Moreover, the optimal variance is $2v_{0}(x_{0})$ at the optimal $\lambda_{0}$ and at the initial wealth $x_{0}$, i.e., the variance of the terminal wealth under the optimal strategy is:
-
-\centerline{$Var(X_{N})=\frac{\beta_{0}}{1-\beta_{0}}(z_{0}-s_{0}x_{0})^{2}$}
-
-The above traces out the efficient frontier as $z_{0}$ varies in $[s_{0}x_{0},+\infty)$. The mutual fund theorem still holds.
-
-
-\subsection{Continuous-Time Model}
-
-\subsubsection*{Market}
-
-We can extend the multi-period model to a continuous-time model. Suppose the market has $m$ risky stocks with prices at time $t$ denoted as $S_{i,t}$, $i=1,...,m$, and a risk-free asset with price $S_{0,t}$ at time $t$. Suppose that the risk-free asset generates net return rate $rdt$ in an infinitesimally small time period $[t,t+dt]$, where $r$ is a constant, i.e.,
-
-\centerline{$dS_{0,t}/S_{0,t}=rdt$}
-
-Suppose that each stock $i$ generates excess return rate $b_{i}dt+\sum_{j=1}^{m}\sigma_{i,j}dW_{j,t}$ for some constants $b_{i}$ and $\sigma_{i,j}$, $j=1,...,m$, where $(W_{1,t})_{t\ge0},...,(W_{m,t})_{t\ge0}$ are $m$ independent standard Brownian motions. In other words,
-
-\centerline{$dS_{i,t}/S_{i,t}=(r+b_{i})dt+\sum_{j=1}^{m}\sigma_{i,j}dW_{j,t}$}
-
-\subsubsection*{Portfolio}
-
-Assume that $\sigma:=(\sigma_{i,j})_{i,j=1,...m}$ is invertible. Denote by $\pi_{t}=(\pi_{1,t},...,\pi_{m,t})^{\top}$ the agent's portfolio held in the infinitesimally small time period $[t,t+dt]$ i.e., $\pi_{i,t}$ dollars are invested in stock $i$, $i = 1,..., m$, and the remaining is invested in the risk-free asset in this period. Then, the agent's wealth, denoted as $(X_{t})_{t\ge0}$, evolves as:
-
-\centerline{$dX_{t}=rX_{t}dt+\pi_{t}(bdt+\sigma dW_{t})$}
-
-where $b:=(b_{1},...,b_{m})^{\top}$ and $W_{t}:=(W_{1,t},...,W_{m,t})^{\top}$. Suppose the agent's wealth at the initial time 0 is $x_{0}$.
-
-\subsubsection*{Expected Utility Maximization}
-
-Consider maximization of expected utility of wealth at a given terminal time $T$:
-
-\centerline{$\max_{(\pi_{t})_{t\in[0,T]}}\mathbb{E}[u(X_{T})]$}
-
-\centerline{$\mathrm{s.t.}\quad dX_{t}=rX_{t}dt+\pi_{t}^{\top}(bdt+\sigma dW_{t})$}
-
-\centerline{$X_{0}=x_{0}$}
-
-where $u(\cdot)$ is the agent's utility function.
-
-For power utility function $u(x)=x^{1-\gamma}/(1-\gamma), x>0$ for certain $0<\gamma\ne1$, the optimal portfolio is:
-
-\centerline{$\pi_{t}^{*}=\frac{1}{\gamma}(\sigma\sigma^{\top})^{-1}b, \quad t\in[0,T]$}
-
-\subsubsection*{Mean-Variance Analysis}
-
-Consider mean-variance portfolio selection. Suppose the target for the expected wealth at the terminal time $T$ is $z_{0}>x_{0}e^{rT}$. The mean-variance problem is:
-
-\centerline{$\max_{(\pi_{t})_{t\in[0,T]}} \frac{1}{2}Var(X_{T})$}
-
-\centerline{$\mathrm{s.t.}\quad dX_{t}=rX_{t}dt+\pi_{t}^{\top}(bdt+\sigma dW_{t})$}
-
-\centerline{$X_{0}=x_{0}$}
-
-\centerline{$\mathbb{E}[X_{T}]=z_{0}$}
-
-The optimal portfolio is:
-
-\centerline{$\pi_{t}^{*}=\left[e^{-r(T-t)}\frac{z_{0}-e^{-b^{\top}(\sigma\sigma^{\top})^{-1}bT}e^{rT}x_{0}}{1-e^{-b^{\top}(\sigma\sigma^{\top})^{-1}bT}}-X_{t}\right](\sigma\sigma^{\top})^{-1}b, \quad t\in[0,T]$}
-
-The optimal variance is:
-
-\centerline{$Var(X_{T})=\frac{e^{-b^{\top}(\sigma\sigma^{\top})^{-1}bT}}{1-e^{-b^{\top}(\sigma\sigma^{\top})^{-1}bT}}(z_{0}-e^{rT}x_{0})^{2}$}
+Reported variance-reduction factors compare ordinary MC with control variates, importance sampling, and importance sampling plus stratification.
