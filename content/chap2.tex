@@ -1,24 +1,24 @@
-\section{Generating Random Numbers and Random Variables}
+\section{Generating Random Numbers}
 
-\subsection{Random Number Generation}
+% \subsection{Random Number Generation}
 
-\subsubsection*{Uniform inputs}
+% \subsubsection*{Uniform inputs}
 
-Monte Carlo simulation is driven by apparently random numbers. Ideally we want $U_1,U_2,\ldots$ such that each $U_i\sim\mathrm{Unif}[0,1]$ and the $U_i$ are mutually independent. Independence is crucial: $U_i$ should not be predictable from $U_1,\ldots,U_{i-1}$.
+% Monte Carlo simulation is driven by apparently random numbers. Ideally we want $U_1,U_2,\ldots$ such that each $U_i\sim\mathrm{Unif}[0,1]$ and the $U_i$ are mutually independent. Independence is crucial: $U_i$ should not be predictable from $U_1,\ldots,U_{i-1}$.
 
-A pseudorandom number generator produces a finite deterministic sequence $u_1,\ldots,u_K\in[0,1]$. A good generator makes short segments hard to distinguish from independent uniforms. Desirable properties: long period, reproducibility, speed, portability, and statistical randomness.
+% A pseudorandom number generator produces a finite deterministic sequence $u_1,\ldots,u_K\in[0,1]$. A good generator makes short segments hard to distinguish from independent uniforms. Desirable properties: long period, reproducibility, speed, portability, and statistical randomness.
 
-\subsubsection*{Linear congruential generator}
+% \subsubsection*{Linear congruential generator}
 
-A linear congruential generator is
+% A linear congruential generator is
 
-$x_{i+1}=a x_i \bmod m,\qquad u_{i+1}=x_{i+1}/m$.
+% $x_{i+1}=a x_i \bmod m,\qquad u_{i+1}=x_{i+1}/m$.
 
-Here $a$ is the multiplier, $m$ the modulus, and $x_0\in\{1,\ldots,m-1\}$ the seed. The modulo operation is
+% Here $a$ is the multiplier, $m$ the modulus, and $x_0\in\{1,\ldots,m-1\}$ the seed. The modulo operation is
 
-$y\bmod m=y-\lfloor y/m\rfloor m$.
+% $y\bmod m=y-\lfloor y/m\rfloor m$.
 
-Once a value repeats, the whole sequence repeats. The generator has full period if it produces all $m-1$ nonzero values before repeating. Large $m$ alone is not enough; poor choices of $a,m$ can produce short cycles.
+% Once a value repeats, the whole sequence repeats. The generator has full period if it produces all $m-1$ nonzero values before repeating. Large $m$ alone is not enough; poor choices of $a,m$ can produce short cycles.
 
 \subsection{General Sampling Methods}
 
@@ -51,17 +51,13 @@ Exponential with mean $\theta$: $F(x)=1-e^{-x/\theta}$ for $x\ge0$, so
 $X=-\theta\log(1-U)$, equivalently $X=-\theta\log U$.
 
 Rayleigh example:
-
-$F(x)=1-e^{-2x(x-b)},\qquad x\ge b$,
+$F(x)=1-e^{-2x(x-b)}, x\ge b$,
 
 so the inverse-transform sample is
-
 $X=\frac{b}{2}+\frac{\sqrt{b^2-2\log U}}{2}$.
 
 Discrete distribution: for outcomes $c_1<\cdots<c_n$ with probabilities $p_i$, define $q_0=0$ and
-
 $q_i=\sum_{j=1}^i p_j$.
-
 Generate $U$, find $K$ with $q_{K-1}<U\le q_K$, and set $X=c_K$. Binary search can implement the lookup.
 
 \subsubsection*{Conditional sampling}
@@ -79,11 +75,9 @@ $P(F^{-1}(V)\le x)=\frac{F(x)-F(a)}{F(b)-F(a)}$.
 \subsubsection*{General method}
 
 To sample from a target density $f$ on $\mathcal{X}$, choose a convenient proposal density $g$ and a constant $c$ such that
-
 $f(x)\le c g(x),\qquad x\in\mathcal{X}$.
 
 Generate $X\sim g$ and $U\sim\mathrm{Unif}[0,1]$. Accept $X$ if
-
 $U\le\frac{f(X)}{c g(X)}$;
 
 otherwise reject and repeat. If $Y$ is the accepted value, then
@@ -95,30 +89,29 @@ The acceptance probability is
 $P(U\le f(X)/(cg(X)))=\int_{\mathcal{X}}\frac{f(x)}{cg(x)}g(x)\,dx=1/c$.
 
 Hence
-
 $P(Y\in A)=c\int_A\frac{f(x)}{cg(x)}g(x)\,dx=\int_A f(x)\,dx$.
 
 Thus $Y$ has density $f$. The number of proposals until acceptance is geometric with mean $c$, so smaller $c$ and tighter bounds are better.
 
-\subsubsection*{Beta distribution}
+% \subsubsection*{Beta distribution}
 
-The beta density on $[0,1]$ is
+% The beta density on $[0,1]$ is
 
-$f(x)=\frac{1}{B(\alpha_1,\alpha_2)}x^{\alpha_1-1}(1-x)^{\alpha_2-1}$.
+% $f(x)=\frac{1}{B(\alpha_1,\alpha_2)}x^{\alpha_1-1}(1-x)^{\alpha_2-1}$.
 
-Here
+% Here
 
-$B(\alpha_1,\alpha_2)=\int_0^1x^{\alpha_1-1}(1-x)^{\alpha_2-1}\,dx=\frac{\Gamma(\alpha_1)\Gamma(\alpha_2)}{\Gamma(\alpha_1+\alpha_2)}$,
+% $B(\alpha_1,\alpha_2)=\int_0^1x^{\alpha_1-1}(1-x)^{\alpha_2-1}\,dx=\frac{\Gamma(\alpha_1)\Gamma(\alpha_2)}{\Gamma(\alpha_1+\alpha_2)}$,
 
-and
+% and
 
-$\Gamma(z)=\int_0^\infty x^{z-1}e^{-x}\,dx,\qquad \operatorname{Re}(z)>0$.
+% $\Gamma(z)=\int_0^\infty x^{z-1}e^{-x}\,dx,\qquad \operatorname{Re}(z)>0$.
 
-For integer $n>0$, $\Gamma(n)=(n-1)!$. If $\alpha_1,\alpha_2\ge1$ and at least one exceeds $1$, the mode is
+% For integer $n>0$, $\Gamma(n)=(n-1)!$. If $\alpha_1,\alpha_2\ge1$ and at least one exceeds $1$, the mode is
 
-$\frac{\alpha_1-1}{\alpha_1+\alpha_2-2}$.
+% $\frac{\alpha_1-1}{\alpha_1+\alpha_2-2}$.
 
-Let $c$ be the maximum value of $f$ and use $g(x)=1$ on $[0,1]$. Generate $U_1,U_2$ until $cU_2\le f(U_1)$, then return $U_1$.
+% Let $c$ be the maximum value of $f$ and use $g(x)=1$ on $[0,1]$. Generate $U_1,U_2$ until $cU_2\le f(U_1)$, then return $U_1$.
 
 \subsubsection*{Normal from double exponential}
 
@@ -127,7 +120,6 @@ For the double exponential density $g(x)=e^{-|x|}/2$ and standard normal density
 $f(x)=\frac{1}{\sqrt{2\pi}}\exp(-x^2/2)$,
 
 the ratio satisfies
-
 $\frac{f(x)}{g(x)}=\sqrt{\frac{2}{\pi}}e^{-x^2/2+|x|}\le\sqrt{\frac{2e}{\pi}}\approx1.3155\equiv c$.
 
 The rejection test may be written as
@@ -141,7 +133,6 @@ Using symmetry: generate $U_1,U_2,U_3$, set $X=-\log U_1$, reject if $U_2>\exp[-
 \subsubsection*{Multivariate normal}
 
 A $d$-dimensional normal is written $N(\mu,\Sigma)$, where $\mu$ is a $d$-vector and $\Sigma$ is a $d\times d$ covariance matrix. A covariance matrix must be symmetric and positive semidefinite:
-
 $x^\top\Sigma x\ge0,\qquad x\in\mathbb{R}^d$.
 
 If $\Sigma$ is positive definite, the density is
@@ -151,15 +142,13 @@ $\phi_{\mu,\Sigma}(x)=\frac{1}{(2\pi)^{d/2}|\Sigma|^{1/2}}\exp\left[-\frac12(x-\
 If $X\sim N(\mu,\Sigma)$, then $X_i\sim N(\mu_i,\sigma_i^2)$ with $\sigma_i^2=\Sigma_{ii}$, and
 
 $\operatorname{Cov}(X_i,X_j)=\mathbb{E}[(X_i-\mu_i)(X_j-\mu_j)]=\Sigma_{ij}$,
-
-$\rho_{ij}=\frac{\Sigma_{ij}}{\sigma_i\sigma_j}$, equivalently $\Sigma_{ij}=\sigma_i\sigma_j\rho_{ij}$.
+$\rho_{ij}=\frac{\Sigma_{ij}}{\sigma_i\sigma_j}$, $\Sigma_{ij}=\sigma_i\sigma_j\rho_{ij}$.
 
 If $\Sigma$ is positive semidefinite but singular, define $X=\mu+AZ$ with $Z\sim N(0,I_d)$ and $AA^\top=\Sigma$. Then $X$ has no full $d$-dimensional density when $\operatorname{rank}(\Sigma)<d$.
 
 \subsubsection*{Useful properties}
 
 Linear transformation: if $X\sim N(\mu,\Sigma)$, then
-
 $AX\sim N(A\mu,A\Sigma A^\top)$.
 
 Conditioning formula: for a partitioned normal vector with $\Sigma_{[22]}$ full rank,
@@ -167,7 +156,6 @@ Conditioning formula: for a partitioned normal vector with $\Sigma_{[22]}$ full 
 $(X_{[1]}\mid X_{[2]}=x)\sim N(\mu_{[1]}+\Sigma_{[12]}\Sigma_{[22]}^{-1}(x-\mu_{[2]}),\ \Sigma_{[11]}-\Sigma_{[12]}\Sigma_{[22]}^{-1}\Sigma_{[21]})$.
 
 Moment generating function:
-
 $\mathbb{E}[\exp(\theta^\top X)]=\exp(\mu^\top\theta+\frac12\theta^\top\Sigma\theta)$.
 
 \subsection{Generating Normals}
@@ -175,21 +163,17 @@ $\mathbb{E}[\exp(\theta^\top X)]=\exp(\mu^\top\theta+\frac12\theta^\top\Sigma\th
 \subsubsection*{Box-Muller method}
 
 The Box-Muller method generates a bivariate standard normal. If $Z\sim N(0,I_2)$, then $R=Z_1^2+Z_2^2$ is exponential with mean $2$:
-
 $P(R\le x)=1-e^{-x/2}$.
 
 Given $R$, $(Z_1,Z_2)$ is uniformly distributed on the circle of radius $\sqrt{R}$. Generate independent $U_1,U_2$, set
-
 $R=-2\log U_1,\qquad V=2\pi U_2$,
 
 and return
-
 $Z_1=\sqrt{R}\cos V,\qquad Z_2=\sqrt{R}\sin V$.
 
 \subsubsection*{Multivariate normals}
 
 To sample $X\sim N(\mu,\Sigma)$, generate $Z\sim N(0,I_d)$, find $A$ such that
-
 $AA^\top=\Sigma$,
 
 and set $X=\mu+AZ$. Then $X\sim N(\mu,\Sigma)$.
@@ -206,22 +190,17 @@ a Cholesky factor is
 
 $A=\begin{pmatrix}\sigma_1&0\\ \rho\sigma_2&\sqrt{1-\rho^2}\sigma_2\end{pmatrix}$.
 
-Thus
-
+Thus generate
 $X_1=\mu_1+\sigma_1Z_1$,
-
 $X_2=\mu_2+\sigma_2\rho Z_1+\sigma_2\sqrt{1-\rho^2}Z_2$.
 
 For general $d$, use
-
 $\Sigma_{ij}=\sum_{k=1}^jA_{ik}A_{jk},\qquad j\le i$.
 
 The recursive formulas are
 
-$A_{ij}=\frac{\Sigma_{ij}-\sum_{k=1}^{j-1}A_{ik}A_{jk}}{A_{jj}},\qquad j<i$,
-
-$A_{ii}=\sqrt{\Sigma_{ii}-\sum_{k=1}^{i-1}A_{ik}^2}$.
-
+$A_{ij}=\frac{\Sigma_{ij}-\sum_{k=1}^{j-1}A_{ik}A_{jk}}{A_{jj}},\, j<i$,
+$\quad A_{ii}=\sqrt{\Sigma_{ii}-\sum_{k=1}^{i-1}A_{ik}^2}$.
 Loop over columns $j=1,\ldots,d$ and rows $i=j,\ldots,d$, solving one new entry at a time.
 
 \subsubsection*{Semidefinite case}
@@ -229,5 +208,4 @@ Loop over columns $j=1,\ldots,d$ and rows $i=j,\ldots,d$, solving one new entry 
 If $\Sigma$ is only positive semidefinite, $\operatorname{rank}(\Sigma)<d$ and some diagonal entry of a lower triangular factor must be zero, so Cholesky may divide by zero or become round-off sensitive. A mathematical fix sets the whole $j$th column of $A$ to zero when $A_{jj}=0$, but exact zero checks are fragile.
 
 Prefer reducing to full rank: choose a subvector $\tilde{X}=(X_{i_1},\ldots,X_{i_k})$ with full-rank covariance $\tilde{\Sigma}$, find $\tilde{A}\tilde{A}^\top=\tilde{\Sigma}$, and sample
-
 $X=D\tilde{A}Z,\qquad Z\sim N(0,I_k)$.
