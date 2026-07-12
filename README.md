@@ -1,3 +1,3 @@
-基于香港中文大学（深圳）2025Fall-MFE5120-投资科学Lecture制作的Cheating Sheet
+基于香港中文大学（深圳）2026Summer-MFE5200-金融工程中的计算方法Lecture制作的Cheating Sheet
 
-By Hengji Gao
+By 高恒基 225040362
