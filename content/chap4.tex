@@ -5,11 +5,9 @@
 \subsubsection*{Basic method}
 
 Let $Y_1,\ldots,Y_n$ be i.i.d. outputs for estimating $\mathbb{E}[Y]$, and suppose $X_i$ is generated with $Y_i$ and $\mathbb{E}[X]$ is known. For fixed $b$ define
-
 $Y_i(b)=Y_i-b(X_i-\mathbb{E}[X])$,
 
 and estimate
-
 $\bar{Y}(b)=\bar{Y}-b(\bar{X}-\mathbb{E}[X])=\frac{1}{n}\sum_{i=1}^n\{Y_i-b(X_i-\mathbb{E}[X])\}$.
 
 This is unbiased for all $b$. Its per-replication variance is
@@ -17,45 +15,36 @@ This is unbiased for all $b$. Its per-replication variance is
 $\sigma^2(b)=\operatorname{var}[Y_i(b)]=\sigma_Y^2-2b\sigma_X\sigma_Y\rho_{XY}+b^2\sigma_X^2$.
 
 The optimal coefficient is
-
 $b^*=\frac{\sigma_Y}{\sigma_X}\rho_{XY}=\frac{\operatorname{Cov}(X,Y)}{\operatorname{var}(X)}$.
 
 The resulting variance ratio relative to plain Monte Carlo is
 
 $\frac{\operatorname{var}[\bar{Y}-b^*(\bar{X}-\mathbb{E}[X])]}{\operatorname{var}[\bar{Y}]}=1-\rho_{XY}^2$.
 
-Thus speed-up is approximately $1/(1-\rho_{XY}^2)$. The sign of $\rho_{XY}$ is absorbed by $b^*$; only $|\rho_{XY}|$ matters.
 
 \subsubsection*{Estimated coefficient and CI}
 
 In practice use the sample regression coefficient
-
 $\hat{b}_n=\frac{\sum_{i=1}^n(X_i-\bar{X})(Y_i-\bar{Y})}{\sum_{i=1}^n(X_i-\bar{X})^2}$.
 
 Then $\hat{b}_n\to b^*$ a.s. and
-
 $\bar{Y}(\hat{b}_n)=\frac{1}{n}\sum_{i=1}^n\{Y_i-\hat{b}_n(X_i-\mathbb{E}[X])\}$.
 
 Using $\hat{b}_n$ creates finite-sample bias, but has the same asymptotic precision as using $b^*$. For fixed $b$,
-
 $\frac{\bar{Y}(b)-\mathbb{E}[Y]}{\sigma(b)/\sqrt{n}}\Rightarrow N(0,1)$,
-
 with sample standard deviation
 
 $s(b)=\left[\frac{1}{n-1}\sum_{i=1}^n(Y_i(b)-\bar{Y}(b))^2\right]^{1/2}$.
 
 Hence an asymptotic CI is $\bar{Y}(b)\pm z_{\delta/2}s(b)/\sqrt{n}$. Also
-
 $\frac{\bar{Y}(\hat{b}_n)-\mathbb{E}[Y]}{s(\hat{b}_n)/\sqrt{n}}\Rightarrow N(0,1)$.
 
 \subsubsection*{Financial controls}
 
 Any martingale with known initial value is a natural control. Under risk-neutral pricing with constant $r$, $e^{-rt}S(t)$ is a martingale, so $\mathbb{E}[e^{-rT}S(T)]=S(0)$. For discounted payoff $Y$,
-
 $\frac{1}{n}\sum_{i=1}^n\{Y_i-b[e^{-rT}S_i(T)-S(0)]\}$
 
 uses the stock as control. For a call, this works best near $K=0$ and may weaken for deep OTM strikes. A stronger control can be a tractable option. For Asian options,
-
 $\bar{S}_A=\frac{1}{n}\sum_{i=1}^nS(t_i),\qquad \bar{S}_G=\left(\prod_{i=1}^nS(t_i)\right)^{1/n}$.
 
 Under GBM, $\bar{S}_G$ is lognormal and the geometric-average Asian option can be priced analytically; its payoff is often highly correlated with the arithmetic-average Asian payoff.
@@ -64,19 +53,16 @@ Under GBM, $\bar{S}_G$ is lognormal and the geometric-average Asian option can b
 
 \subsubsection*{Estimator}
 
-Antithetic variates pair inputs to create negative dependence while preserving the marginal law. If $U\sim\operatorname{Unif}[0,1]$, use $U$ and $1-U$; for a symmetric normal input, use $Z$ and $-Z$.
+Antithetic variates pair inputs to create negative dependence. If $U\sim\operatorname{Unif}[0,1]$, use $U$ and $1-U$; for a symmetric normal input, use $Z$ and $-Z$.
 
 Let $(Y_i,\tilde{Y}_i)$ be i.i.d. pairs with the same marginal distribution. The estimator is
 
 $\hat{Y}_{AV}=\frac{1}{2n}\left(\sum_{i=1}^nY_i+\sum_{i=1}^n\tilde{Y}_i\right)=\frac{1}{n}\sum_{i=1}^n\frac{Y_i+\tilde{Y}_i}{2}$.
 
 Apply the CLT to pair averages:
-
-$\frac{\hat{Y}_{AV}-\mathbb{E}[Y]}{\sigma_{AV}/\sqrt{n}}\Rightarrow N(0,1),\qquad \sigma_{AV}^2=\operatorname{var}\left(\frac{Y_i+\tilde{Y}_i}{2}\right)$.
+$\frac{\hat{Y}_{AV}-\mathbb{E}[Y]}{\sigma_{AV}/\sqrt{n}}\Rightarrow N(0,1),\quad \sigma_{AV}^2=\operatorname{var}\left(\frac{Y_i+\tilde{Y}_i}{2}\right)$.
 
 A CI is $\hat{Y}_{AV}\pm z_{\delta/2}s_{AV}/\sqrt{n}$, where $s_{AV}$ is the sample sd of pair averages.
-
-\subsubsection*{When it helps}
 
 Compare $n$ antithetic pairs with $2n$ independent samples. Since
 
@@ -93,7 +79,6 @@ $S_i^+=S_0\exp\left((r-\frac12\sigma^2)T+\sigma\sqrt{T}Z_i\right)$,
 $S_i^-=S_0\exp\left((r-\frac12\sigma^2)T-\sigma\sqrt{T}Z_i\right)$.
 
 Set $X_i=e^{-rT}(S_i^+-K)^+$ and $Y_i=e^{-rT}(S_i^--K)^+$. Then
-
 $\hat{v}=\frac{1}{n}\sum_{i=1}^n\frac{X_i+Y_i}{2}$,
 
 $\mathrm{SE}=\left[\frac{1}{n(n-1)}\left\{\sum_{i=1}^n\left(\frac{X_i+Y_i}{2}\right)^2-n\hat{v}^2\right\}\right]^{1/2}$.
@@ -110,8 +95,6 @@ With proportional allocation $n_i=np_i$ and conditional draws $Y_{ij}\sim (Y\mid
 
 $\hat{Y}=\sum_{i=1}^Kp_i\frac{1}{n_i}\sum_{j=1}^{n_i}Y_{ij}=\frac{1}{n}\sum_{i=1}^K\sum_{j=1}^{n_i}Y_{ij}$.
 
-Stratification removes the random variation in the number of observations landing in each stratum.
-
 \subsubsection*{General allocation}
 
 Often strata are defined by another variable $X$. If $A_i$ partition the support of $X$,
@@ -124,12 +107,9 @@ $\hat{Y}=\sum_{i=1}^Kp_i\frac{1}{n_i}\sum_{j=1}^{n_i}Y_{ij}=\frac{1}{n}\sum_{i=1
 
 Let $\mu_i=\mathbb{E}[Y\mid X\in A_i]$ and $\sigma_i^2=\operatorname{var}(Y\mid X\in A_i)$. Then $\hat{Y}$ is unbiased and
 
-$\operatorname{var}[\hat{Y}]=\sum_{i=1}^Kp_i^2\frac{\sigma_i^2}{n_i}=\frac{\sigma^2(q)}{n},\qquad \sigma^2(q)=\sum_{i=1}^K\frac{p_i^2}{q_i}\sigma_i^2$.
-
+$\operatorname{var}[\hat{Y}]=\sum_{i=1}^Kp_i^2\frac{\sigma_i^2}{n_i}=\frac{\sigma^2(q)}{n},\quad \sigma^2(q)=\sum_{i=1}^K\frac{p_i^2}{q_i}\sigma_i^2$.
 With fixed $K$, $\sqrt{n}(\hat{Y}-\mu)\Rightarrow N(0,\sigma^2(q))$, and
-
 $s^2(q)=\sum_{i=1}^K\frac{p_i^2}{q_i}s_i^2$
-
 estimates $\sigma^2(q)$.
 
 \subsubsection*{Uniform and inverse-transform strata}
@@ -145,7 +125,6 @@ $V=F(a_{i-1})+U\{F(a_i)-F(a_{i-1})\},\qquad F^{-1}(V)\sim (Y\mid Y\in A_i)$.
 \subsubsection*{Proportional and optimal allocation}
 
 For proportional allocation $q_i=p_i$,
-
 $\sigma^2(q)=\sum_{i=1}^Kp_i\sigma_i^2$.
 
 Plain variance decomposes as
@@ -154,9 +133,8 @@ $\operatorname{var}(Y)=\sum_{i=1}^Kp_i\sigma_i^2+\sum_{i=1}^Kp_i\mu_i^2-\left(\s
 
 By Jensen, proportional stratification cannot increase variance, with strict gain unless all $\mu_i$ are equal. Optimizing $\sigma^2(q)$ gives
 
-$q_i^*=\frac{p_i\sigma_i}{\sum_{\ell=1}^Kp_\ell\sigma_\ell},\qquad \sigma^2(q^*)=\left(\sum_{i=1}^Kp_i\sigma_i\right)^2$.
+$q_i^*=\frac{p_i\sigma_i}{\sum_{\ell=1}^Kp_\ell\sigma_\ell},\quad \sigma^2(q^*)=\left(\sum_{i=1}^Kp_i\sigma_i\right)^2$.
 
-Thus allocate samples proportional to stratum probability times within-stratum sd.
 
 \subsubsection*{Call option strata}
 
@@ -181,7 +159,6 @@ The likelihood ratio is $f(Y)/g(Y)$, and the estimator averages $h(Y_i)f(Y_i)/g(
 \subsubsection*{Variance and zero-variance density}
 
 The IS estimator has variance
-
 $\frac{1}{n}\operatorname{var}_g\left[h(Y)\frac{f(Y)}{g(Y)}\right]$.
 
 For $h\ge0$, the zero-variance density is
@@ -199,9 +176,7 @@ $\frac{f(x)}{g(x)}=\exp\left(-\theta x+\frac12\theta^2\right)$.
 Mode matching sets $\theta=\arg\max_x h(x)f(x)$. For a binary call,
 
 $\mathbb{E}[e^{-rT}\mathbf{1}_{\{S_T\ge K\}}]=\mathbb{E}[e^{-rT}\mathbf{1}_{\{X\ge b\}}]$,
-
 where
-
 $b=\frac{\log(K/S_0)-(r-\sigma^2/2)T}{\sigma\sqrt{T}}$.
 
 Here $h(x)=e^{-rT}\mathbf{1}_{\{x\ge b\}}$, $x^*=\max\{b,0\}$, and with $Y\sim N(x^*,1)$ the output is
@@ -209,7 +184,6 @@ Here $h(x)=e^{-rT}\mathbf{1}_{\{x\ge b\}}$, $x^*=\max\{b,0\}$, and with $Y\sim N
 $h(Y)\frac{f(Y)}{g(Y)}=\begin{cases}0,&Y<b,\\ \exp\{-rT-x^*Y+(x^*)^2/2\},&Y\ge b.\end{cases}$
 
 For a vanilla call,
-
 $h(x)=\left(S_0\exp\left\{-\frac12\sigma^2T+\sigma\sqrt{T}x\right\}-e^{-rT}K\right)^+$,
 
 and the shift pushes sampling toward exercise states.
@@ -218,10 +192,8 @@ and the shift pushes sampling toward exercise states.
 
 For density $f$, the exponential tilt family is
 
-$f_\theta(x)=\frac{e^{\theta x}f(x)}{\mathbb{E}[e^{\theta X}]},\qquad \theta\in\mathbb{R}$.
-
+$f_\theta(x)=\frac{e^{\theta x}f(x)}{\mathbb{E}[e^{\theta X}]},\, \theta\in\mathbb{R}$.
 For a pmf $p$,
-
 $p_\theta(x)=\frac{e^{\theta x}p(x)}{\mathbb{E}[e^{\theta X}]}$.
 
 For normal $X$, this is mean shifting. For rare large losses, take $\theta>0$.
@@ -233,11 +205,9 @@ Let independent defaults satisfy $P(X_k=1)=p_k$ and $L=\sum_{k=1}^mX_k$. To esti
 $\bar{p}_k=P(Y_k=1)=\frac{p_ke^\theta}{1+p_k(e^\theta-1)},\qquad \bar{L}=\sum_{k=1}^mY_k$.
 
 The IS output is
-
 $H=\mathbf{1}_{\{\bar{L}>x\}}\prod_{k=1}^m\left(\frac{p_k}{\bar{p}_k}\right)^{Y_k}\left(\frac{1-p_k}{1-\bar{p}_k}\right)^{1-Y_k}$.
 
 With
-
 $\phi(\theta)=\sum_{k=1}^m\log[1+p_k(e^\theta-1)]$,
 
 one has $E[H^2]\le e^{-2\theta x+2\phi(\theta)}$. Choose $\theta>0$ by solving $\phi'(\theta)=x$.
@@ -247,33 +217,26 @@ one has $E[H^2]\le e^{-2\theta x+2\phi(\theta)}$. Choose $\theta>0$ by solving $
 \subsubsection*{Principle}
 
 Cross-entropy selects a parametric IS density $f_\theta$ close to the zero-variance density
-
 $g^*(x)=\frac{1}{\mu}h(x)f(x)$.
 
 Minimize
-
 $R(g^*\|f_\theta)=\int \log\left(\frac{g^*(x)}{f_\theta(x)}\right)g^*(x)\,dx$,
 
 equivalently maximize
-
 $\int h(x)f(x)\log f_\theta(x)\,dx$.
 
 The population first-order equation is
-
 $\mathbb{E}\left[h(X)\frac{\partial}{\partial\theta}\log f_\theta(X)\right]=0$.
 
 \subsubsection*{Basic algorithm}
 
 Using pilot samples $X_1,\ldots,X_N\sim f$, solve
-
 $\frac{1}{N}\sum_{k=1}^Nh(X_k)\frac{\partial}{\partial\theta}\log f_\theta(X_k)=0$.
 
 For $f=N(0,I_m)$ and $f_\theta=N(\theta,I_m)$,
-
 $\hat{\theta}=\frac{\sum_{k=1}^Nh(X_k)X_k}{\sum_{k=1}^Nh(X_k)}$.
 
 Then sample $Y_i\sim f_{\hat{\theta}}$ and average
-
 $H_i=h(Y_i)\frac{f(Y_i)}{f_{\hat{\theta}}(Y_i)}$.
 
 For a one-dimensional normal shift, $H_i=h(Y_i)\exp\{-\hat{\theta}Y_i+\hat{\theta}^2/2\}$. For very rare events, the basic method may fail because $\sum_kh(X_k)=0$ in the pilot run.
@@ -283,9 +246,7 @@ For a one-dimensional normal shift, $H_i=h(Y_i)\exp\{-\hat{\theta}Y_i+\hat{\thet
 Let $\ell_\theta(x)=f(x)/f_\theta(x)$. If pilot samples are drawn from $f_\nu$, then maximize
 
 $\mathbb{E}_\nu[h(Y)\ell_\nu(Y)\log f_\theta(Y)]$,
-
 and solve
-
 $\mathbb{E}_\nu\left[h(Y)\ell_\nu(Y)\frac{\partial}{\partial\theta}\log f_\theta(Y)\right]=0$.
 
 At iteration $j$, sample $Y_k\sim f_{\hat{\theta}^j}$ and update from
@@ -293,11 +254,7 @@ At iteration $j$, sample $Y_k\sim f_{\hat{\theta}^j}$ and update from
 $\frac{1}{N}\sum_{k=1}^Nh(Y_k)\ell_{\hat{\theta}^j}(Y_k)\frac{\partial}{\partial\theta}\log f_\theta(Y_k)=0$.
 
 For $N(\theta,I_m)$,
-
 $\hat{\theta}^{j+1}=\frac{\sum_{k=1}^Nh(Y_k)\ell_{\hat{\theta}^j}(Y_k)Y_k}{\sum_{k=1}^Nh(Y_k)\ell_{\hat{\theta}^j}(Y_k)}$.
 
 Here
-
 $\ell_{\hat{\theta}^j}(Y_k)=\exp(-\langle\hat{\theta}^j,Y_k\rangle+\|\hat{\theta}^j\|^2/2)$.
-
-Usually only a few iterations are needed; convergence means the updates oscillate in a small range rather than become deterministic.

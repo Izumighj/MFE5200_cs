@@ -13,7 +13,6 @@ Since $\mathbb{E}[\hat\Delta_F]=h^{-1}\{\alpha(\theta+h)-\alpha(\theta)\}$, if $
 $\operatorname{Bias}(\hat\Delta_F)=\mathbb{E}[\hat\Delta_F-\alpha'(\theta)]=\frac12\alpha''(\theta)h+o(h)$.
 
 The central-difference estimator is
-
 $\hat\Delta_C(n,h)=\frac{\bar Y_n(\theta+h)-\bar Y_n(\theta-h)}{2h}$.
 
 Taylor expansion gives $\operatorname{Bias}(\hat\Delta_C)=o(h)$; if $\alpha'''(\theta)$ exists,
@@ -41,11 +40,9 @@ $\mathrm{SE}=\left[\frac{1}{n(n-1)}\left(\sum_{i=1}^nH_i^2-n\hat v^2\right)\righ
 \subsubsection*{Method}
 
 Differentiate the random output:
-
 $Y'(\theta)=\lim_{h\to0}\frac{Y(\theta+h)-Y(\theta)}{h}$.
 
 It is unbiased for $\alpha'(\theta)$ if
-
 $\mathbb{E}\left[\frac{d}{d\theta}Y(\theta)\right]=\frac{d}{d\theta}\mathbb{E}[Y(\theta)]$.
 
 Then estimate $\alpha'(\theta)$ by the sample average of copies of $Y'(\theta)$.
@@ -75,11 +72,9 @@ differentiate the recursion:
 $\frac{dS(t_i)}{d\sigma}=\frac{dS(t_{i-1})}{d\sigma}\frac{S(t_i)}{S(t_{i-1})}+S(t_i)\{-\sigma(t_i-t_{i-1})+\sqrt{t_i-t_{i-1}}Z_i\}$.
 
 With $dS(0)/d\sigma=0$,
-
 $\frac{dS(t_i)}{d\sigma}=S(t_i)\left[-\sigma t_i+\sum_{j=1}^i\sqrt{t_j-t_{j-1}}Z_j\right]$.
 
 The pathwise Asian vega is
-
 $e^{-rT}\frac1m\sum_{i=1}^m\frac{dS(t_i)}{d\sigma}\mathbf{1}_{\{\bar S>K\}}$.
 
 \subsubsection*{Spread delta and failures}
@@ -105,15 +100,12 @@ The score is $\dot g_\theta(X)/g_\theta(X)=d\log g_\theta(X)/d\theta$. LRM handl
 \subsubsection*{Lognormal delta score}
 
 For lognormal $S(T)$,
-
-$g(x)=\frac{1}{x\sigma\sqrt T}\phi(\zeta(x)),\qquad \zeta(x)=\frac{\log(x/S(0))-(r-\sigma^2/2)T}{\sigma\sqrt T}$.
+$g(x)=\frac{1}{x\sigma\sqrt T}\phi(\zeta(x)),\zeta(x)=\frac{\log(x/S(0))-(r-\sigma^2/2)T}{\sigma\sqrt T}$.
 
 The $S(0)$ score is
-
 $\frac{\partial g(x)/\partial S(0)}{g(x)}=\frac{\log(x/S(0))-(r-\sigma^2/2)T}{S(0)\sigma^2T}$.
 
 If $S(T)$ is generated with $Z$, then $\zeta(S(T))=Z$. For any discounted payoff $f(S(T))$, the delta estimator is
-
 $f(S(T))\frac{Z}{S(0)\sigma\sqrt T}$.
 
 Thus for a call use $e^{-rT}(S(T)-K)^+Z/(S(0)\sigma\sqrt T)$; for a digital use $e^{-rT}\mathbf{1}_{\{S(T)>K\}}Z/(S(0)\sigma\sqrt T)$.
@@ -121,7 +113,6 @@ Thus for a call use $e^{-rT}(S(T)-K)^+Z/(S(0)\sigma\sqrt T)$; for a digital use 
 \subsubsection*{Path scores}
 
 For a GBM path,
-
 $g(x_1,\ldots,x_m)=g_1(x_1\mid S(0))g_2(x_2\mid x_1)\cdots g_m(x_m\mid x_{m-1})$.
 
 Only the first factor depends on $S(0)$, so the Asian delta score is
@@ -135,7 +126,6 @@ $\frac{\partial}{\partial\sigma}\log g(S(t_1),\ldots,S(t_m))=\sum_{j=1}^m\left(\
 \subsubsection*{Multivariate normal score}
 
 If $X\sim N(\mu(\theta),\Sigma)$, then
-
 $\frac{d}{d\theta}\log g_\theta(X)=(X-\mu(\theta))^\top\Sigma^{-1}\dot\mu(\theta)$.
 
 If $X=\mu(\theta)+AZ$, $Z\sim N(0,I)$, and $AA^\top=\Sigma$, the score is
@@ -143,11 +133,9 @@ If $X=\mu(\theta)+AZ$, $Z\sim N(0,I)$, and $AA^\top=\Sigma$, the score is
 $\frac{d}{d\theta}\log g_\theta(X)=Z^\top A^{-1}\dot\mu(\theta)$.
 
 If $\theta$ is in $\Sigma$,
-
 $\frac{d}{d\theta}\log g_\theta(X)=-\frac12\operatorname{tr}(\Sigma^{-1}\dot\Sigma)+\frac12(X-\mu)^\top\Sigma^{-1}\dot\Sigma\Sigma^{-1}(X-\mu)$.
 
 For $d$-asset GBM with $dS_i(t)/S_i(t)=r\,dt+v_i^\top dW(t)$, let $A$ have rows $v_i^\top$ and $\Sigma=AA^\top$. Then
-
 $X\sim N(\mu,T\Sigma),\qquad \mu_i=\log S_i(0)+(r-\frac12\|v_i\|^2)T$.
 
 For payoff $f(S_1(T),\ldots,S_d(T))$, the LRM delta for asset $i$ is
@@ -159,11 +147,9 @@ $f(S_1(T),\ldots,S_d(T))\frac{(Z^\top A^{-1})_i}{S_i(0)\sqrt T}$.
 \subsubsection*{LRM gamma}
 
 If $\ddot g_\theta$ is the second density derivative, then
-
 $f(X)\frac{\ddot g_\theta(X)}{g_\theta(X)}$
 
 estimates $d^2\mathbb{E}_\theta[f(X)]/d\theta^2$, under valid derivative-expectation interchanges. For Black-Scholes gamma,
-
 $\frac{d^2g(S(T))/dS^2(0)}{g(S(T))}=\frac{\zeta(S(T))^2-1}{S(0)^2\sigma^2T}-\frac{\zeta(S(T))}{S(0)^2\sigma\sqrt T}$.
 
 Replace $\zeta(S(T))$ by $Z$ when using the usual GBM simulation. Higher derivatives introduce higher powers and often larger variance. For $X\sim N(\mu,\sigma^2)$,
@@ -177,11 +163,9 @@ For $dS_t=rS_tdt+\theta_tS_tdW_t$, $d\theta_t=a(\Theta-\theta_t)dt+\beta dB_t$, 
 $dY_t=(r-\frac12\theta_t^2)dt+\theta_tdW_t,\qquad Y_0=0$.
 
 Then call delta is
-
 $\Delta=\mathbb{E}\left[\mathbf{1}_{\{Y_T\ge y\}}e^{Y_T-rT}\right],\qquad y=\log(K/S_0)$.
 
 Use Euler for $(Y,\theta)$ and an artificial constant-volatility process with the same $Z_i$:
-
 $\bar Y_{i+1}=\bar Y_i+(r-\frac12\sigma^2)\Delta t_i+\sigma\sqrt{\Delta t_i}Z_{i+1}$.
 
 The control is $V=\mathbf{1}_{\{\bar Y_T\ge y\}}e^{\bar Y_T-rT}$ with
@@ -197,7 +181,6 @@ For $dS_t=rS_tdt+\sigma(S_t)dW_t$ and $V(S_0)=\mathbb{E}[e^{-rT}h(S_T)]$,
 $\Delta=\mathbb{E}\left[e^{-rT}h'(S_T)\frac{\partial S_T}{\partial S_0}\right]$.
 
 Euler simulation:
-
 $\hat S_0=S_0,\qquad \hat S_{i+1}=\hat S_i+r\hat S_i\Delta t_i+\sigma(\hat S_i)\sqrt{\Delta t_i}Z_{i+1}$.
 
 Define $\hat\Delta_i=\partial\hat S_{t_i}/\partial S_0$. Then

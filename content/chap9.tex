@@ -13,7 +13,6 @@ A common estimator is the posterior mean $\hat\theta=\int\theta\pi(\theta\mid x)
 \subsubsection*{Normal-normal conjugacy}
 
 If $x_i\stackrel{iid}{\sim}N(\mu,\sigma^2)$ with known $\sigma^2$ and $\mu\sim N(m,\tau^2)$, then $\mu\mid x\sim N(m_1,\tau_1^2)$, where
-
 $m_1=\dfrac{\tau^2\bar x+m\sigma^2/n}{\tau^2+\sigma^2/n},\qquad \tau_1^2=\dfrac{\tau^2\sigma^2}{n\tau^2+\sigma^2}$.
 
 As $n\to\infty$, $m_1\to\bar x$ and $\tau_1^2\to0$. As $\tau^2\to\infty$, the prior becomes noninformative and $\mu\mid x\sim N(\bar x,\sigma^2/n)$.
@@ -39,7 +38,6 @@ MCMC constructs a Markov chain whose limiting distribution is the target posteri
 $\theta_j^{(i)}\sim p(\theta_j\mid\theta_1^{(i)},\ldots,\theta_{j-1}^{(i)},\theta_{j+1}^{(i-1)},\ldots,\theta_r^{(i-1)},x)$.
 
 Under standard regularity conditions, $\theta^{(i)}$ converges in distribution to $p(\theta\mid x)$. Discard $M$ burn-in draws and estimate
-
 $\hat\theta_j=\dfrac1n\sum_{i=1}^n\theta_j^{(M+i)}$.
 
 \subsubsection*{Bivariate normal}
@@ -58,7 +56,7 @@ For $x_j\sim N(\mu,\sigma^2)$ with both unknown,
 
 $\mu_i\mid\sigma_{i-1}^2\sim N(m_i,\tau_i^2),\quad m_i=\dfrac{\tau_{i-1}^2\bar x+m_{i-1}\sigma_{i-1}^2/n}{\tau_{i-1}^2+\sigma_{i-1}^2/n},\quad \tau_i^2=\dfrac{\tau_{i-1}^2\sigma_{i-1}^2}{n\tau_{i-1}^2+\sigma_{i-1}^2}$.
 
-$\sigma_i^2\mid\mu_i\sim IG(\alpha_i,\beta_i),\qquad \alpha_i=\alpha_{i-1}+n/2,\qquad \beta_i=\beta_{i-1}+\dfrac12\sum_{j=1}^n(x_j-\mu_i)^2$.
+$\sigma_i^2\mid\mu_i\sim IG(\alpha_i,\beta_i),\quad \alpha_i=\alpha_{i-1}+n/2,\quad \beta_i=\beta_{i-1}+\dfrac12\sum_{j=1}^n(x_j-\mu_i)^2$.
 
 Alternate these draws, discard burn-in, and average the retained values.
 
@@ -68,7 +66,7 @@ Alternate these draws, discard burn-in, and average the retained values.
 
 Merton's model is $d\log S_t=\mu dt+\sigma dW_t+YdN_t$, where $N_t$ has intensity $\lambda$ and $Y\sim N(k,s^2)$. For small $\Delta t$,
 
-$x_i=\Delta\log S_i=\mu\Delta t+\sigma\Delta W_i+Y_i\Delta N_i,\qquad P(\Delta N_i=1)=\lambda\Delta t$.
+$x_i=\Delta\log S_i=\mu\Delta t+\sigma\Delta W_i+Y_i\Delta N_i,\quad P(\Delta N_i=1)=\lambda\Delta t$.
 
 Conditional return laws are
 
@@ -101,11 +99,8 @@ One Gibbs sweep updates $\mu,\sigma^2,\lambda,k,s^2$, every $\Delta N_i$, and th
 \subsubsection*{Detailed balance}
 
 For transition probabilities $p_{ij}$, stationarity requires $\pi(j)=\sum_i\pi(i)p_{ij}$. Detailed balance,
-
 $\pi(i)p_{ij}=\pi(j)p_{ji}$,
-
 is sufficient. Starting with proposal $q_{ij}$, accept $i\to j$ with
-
 $\alpha_{ij}=\min\left\{1,\dfrac{\pi(j)q_{ji}}{\pi(i)q_{ij}}\right\}$.
 
 Then $p_{ij}=q_{ij}\alpha_{ij}$ for $i\ne j$, with leftover probability assigned to staying at $i$; the resulting chain is reversible with stationary distribution $\pi$.

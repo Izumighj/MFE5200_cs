@@ -160,44 +160,44 @@ Asian call and put payoffs are $(\bar{S}-K)^+$ and $(K-\bar{S})^+$. Floating-str
 For continuous monitoring over $[u,t]$,
 $\bar{S}=\frac{1}{t-u}\int_u^tS(\tau)\,d\tau$.
 
-\subsubsection*{Geometric average options}
+% \subsubsection*{Geometric average options}
 
-The discrete geometric average is
-$G=\left(\prod_{i=1}^nS(t_i)\right)^{1/n}$.
+% The discrete geometric average is
+% $G=\left(\prod_{i=1}^nS(t_i)\right)^{1/n}$.
 
-Because lognormal variables remain lognormal under geometric averaging, these options are analytically convenient. Under risk-neutral GBM with dividend yield $\delta$,
-$G=S(0)\exp\left(\left[r-\delta-\frac12\sigma^2\right]\frac{1}{n}\sum_{i=1}^nt_i+\frac{\sigma}{n}\sum_{i=1}^nW(t_i)\right)$.
+% Because lognormal variables remain lognormal under geometric averaging, these options are analytically convenient. Under risk-neutral GBM with dividend yield $\delta$,
+% $G=S(0)\exp\left(\left[r-\delta-\frac12\sigma^2\right]\frac{1}{n}\sum_{i=1}^nt_i+\frac{\sigma}{n}\sum_{i=1}^nW(t_i)\right)$.
 
-Since $\operatorname{Cov}(W(s),W(t))=\min(s,t)$,
-$\sum_{i=1}^nW(t_i)\sim N\left(0,\sum_{i=1}^n(2i-1)t_{n+1-i}\right)$.
+% Since $\operatorname{Cov}(W(s),W(t))=\min(s,t)$,
+% $\sum_{i=1}^nW(t_i)\sim N\left(0,\sum_{i=1}^n(2i-1)t_{n+1-i}\right)$.
 
-The geometric average has the same distribution as a GBM value at
+% The geometric average has the same distribution as a GBM value at
 
-$T_G=\frac{1}{n}\sum_{i=1}^nt_i$,
-with adjusted volatility and dividend yield
+% $T_G=\frac{1}{n}\sum_{i=1}^nt_i$,
+% with adjusted volatility and dividend yield
 
-$\bar{\sigma}^2=\frac{\sigma^2}{n^2T_G}\sum_{i=1}^n(2i-1)t_{n+1-i}$,
-$\bar{\delta}=\delta+\frac12\sigma^2-\frac12\bar{\sigma}^2$.
+% $\bar{\sigma}^2=\frac{\sigma^2}{n^2T_G}\sum_{i=1}^n(2i-1)t_{n+1-i}$,
+% $\bar{\delta}=\delta+\frac12\sigma^2-\frac12\bar{\sigma}^2$.
 
-Thus a geometric-average option can be priced using Black-Scholes with adjusted parameters. The continuous geometric average
+% Thus a geometric-average option can be priced using Black-Scholes with adjusted parameters. The continuous geometric average
 
-$\exp\left(\frac{1}{t-u}\int_u^t\log S(\tau)\,d\tau\right)$
-is also lognormally distributed.
+% $\exp\left(\frac{1}{t-u}\int_u^t\log S(\tau)\,d\tau\right)$
+% is also lognormally distributed.
 
-\subsubsection*{Barrier and lookback options}
+% \subsubsection*{Barrier and lookback options}
 
-A discretely monitored down-and-out call with barrier $b$ has payoff
+% A discretely monitored down-and-out call with barrier $b$ has payoff
 
-$\mathbf{1}_{\{\tau(b)>T\}}(S(T)-K)^+,\qquad \tau(b)=\inf\{t_i:S(t_i)<b\}$.
+% $\mathbf{1}_{\{\tau(b)>T\}}(S(T)-K)^+,\qquad \tau(b)=\inf\{t_i:S(t_i)<b\}$.
 
-If no grid value crosses below $b$, set $\tau(b)=\infty$. A down-and-in call has payoff
+% If no grid value crosses below $b$, set $\tau(b)=\infty$. A down-and-in call has payoff
 
-$\mathbf{1}_{\{\tau(b)\le T\}}(S(T)-K)^+$.
+% $\mathbf{1}_{\{\tau(b)\le T\}}(S(T)-K)^+$.
 
-For continuous monitoring, use $\tilde{\tau}(b)=\inf\{t\ge0:S(t)\le b\}$. Discretely monitored barrier options are priced by simulating $S(t_1),\ldots,S(t_n),S(T)$.
+% For continuous monitoring, use $\tilde{\tau}(b)=\inf\{t\ge0:S(t)\le b\}$. Discretely monitored barrier options are priced by simulating $S(t_1),\ldots,S(t_n),S(T)$.
 
-Lookback options depend on path extrema. Discrete lookback put and call payoffs at $t_n$ are
-$\max_{i=1,\ldots,n}S(t_i)-S(t_n),\qquad S(t_n)-\min_{i=1,\ldots,n}S(t_i)$.
+% Lookback options depend on path extrema. Discrete lookback put and call payoffs at $t_n$ are
+% $\max_{i=1,\ldots,n}S(t_i)-S(t_n),\qquad S(t_n)-\min_{i=1,\ldots,n}S(t_i)$.
 
 \subsection{Multi-Asset GBM}
 

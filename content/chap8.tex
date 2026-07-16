@@ -9,7 +9,6 @@ Let $S$ be market prices/rates, $\Delta t$ the risk horizon, $\Delta S$ the risk
 $L=-\Delta V=V(S,t)-V(S+\Delta S,t+\Delta t),\qquad F_L(x)=P(L<x)$.
 
 For tail probability $p$, VaR $x_p$ satisfies
-
 $1-F_L(x_p)=P(L>x_p)=p$.
 
 For 99\% VaR, $p=0.01$. VaR is not coherent because subadditivity can fail.
@@ -25,7 +24,6 @@ Thus 99\% VaR is approximately $2.33\sigma_L$.
 \subsubsection*{Delta-gamma approximation}
 
 For nonlinear portfolios,
-
 $\Delta V\approx\frac{\partial V}{\partial t}\Delta t+\delta^\top\Delta S+\frac12\Delta S^\top\Gamma\Delta S$,
 
 $\delta_i=\frac{\partial V}{\partial S_i},\qquad \Gamma_{ij}=\frac{\partial^2V}{\partial S_i\partial S_j}$.
@@ -61,7 +59,6 @@ $P(L>x)\approx\frac1n\sum_{i=1}^n\mathbf{1}_{\{L_i>x\}}$.
 The bottleneck is portfolio revaluation. With empirical CDF
 
 $\hat F_{L,n}(x)=\frac1n\sum_{i=1}^n\mathbf{1}_{\{L_i\le x\}}$,
-
 estimate VaR by $\hat x_p=\hat F_{L,n}^{-1}(1-p)$.
 
 \subsection{Variance Reduction}
@@ -77,11 +74,9 @@ $P(Q>y)$ is known by transform inversion, and $y$ need not equal $x$. The method
 \subsubsection*{Importance sampling}
 
 Large $Q$ occurs when $b_jZ_j$ is large or when $\lambda_jZ_j^2$ is large with $\lambda_j>0$. Define the twisted measure
-
 $\frac{dP_\theta}{dP}=e^{\theta Q-\psi(\theta)}$.
 
 Then
-
 $P(L>x)=\mathbb{E}_\theta\left[e^{-\theta Q+\psi(\theta)}\mathbf{1}_{\{L>x\}}\right]$.
 
 Under $P_\theta$, $Z$ remains normal with diagonal covariance:
@@ -97,7 +92,6 @@ Choose $\theta>0$ with finite $\psi(\theta)$. For each path, generate $Z\sim N(\
 $e^{-\theta Q+\psi(\theta)}\mathbf{1}_{\{L>x\}}$.
 
 Average over paths. A practical twisting parameter solves
-
 $\psi'(\theta_x)=x$.
 
 Since $\psi'(\theta)=\mathbb{E}_\theta[Q]$, this samples under a distribution with $\mathbb{E}_{\theta_x}[Q]=x$, moving the rare threshold near the center of the new distribution.
@@ -109,7 +103,6 @@ Stratify the IS estimator by $Q$. For strata $A_1,\ldots,A_K$,
 $\mathbb{E}_\theta[e^{-\theta Q+\psi(\theta)}\mathbf{1}_{\{L>x\}}]=\sum_{k=1}^KP_\theta(Q\in A_k)\mathbb{E}_\theta[e^{-\theta Q+\psi(\theta)}\mathbf{1}_{\{L>x\}}\mid Q\in A_k]$.
 
 Under $P_\theta$,
-
 $\psi_\theta(u)=\psi(\theta+u)-\psi(\theta),\qquad \hat\phi_\theta(u)=e^{\psi(\theta+iu)-\psi(\theta)}$.
 
 Use inversion to find $F_\theta(x)=P_\theta(Q\le x)$ and stratum endpoints $a_k$ with desired probabilities, $A_k=(a_{k-1},a_k)$.
